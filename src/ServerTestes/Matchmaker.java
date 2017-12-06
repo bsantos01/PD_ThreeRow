@@ -9,9 +9,7 @@ package ServerTestes;
  *
  * @author Bruno Santos
  */
-import java.io.DataInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.ServerSocket;
 import java.util.HashMap;
 import java.util.Map;
