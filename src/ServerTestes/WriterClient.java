@@ -25,10 +25,11 @@ public class WriterClient {
             Writer writer
                     = new OutputStreamWriter(client.getOutputStream(), "UTF-8");
             PrintWriter out = new PrintWriter(writer);
-            for (int i = 0; i < 30; ++i) {
-                out.println("Message line " + i);
-            }
+            while(true){
+                out.println("Message line ");
+            
             out.flush();
+            }
         } catch (IOException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }

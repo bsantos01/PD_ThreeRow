@@ -90,11 +90,7 @@ public class Matchmaker extends Thread {
 
     private void establishConnection(ClientSocket socket, ClientSocket other)
             throws IOException {
-        Thread thread = new StreamCopier(
-                socket.getInputStream(), other.getOutputStream());
-        thread.start();
-        thread = new StreamCopier(
-                other.getInputStream(), socket.getOutputStream());
-        thread.start();
+                    GameServer Gserver= new GameServer(socket, other);
+                    Gserver.start();
     }
 }
