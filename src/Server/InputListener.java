@@ -31,6 +31,7 @@ public class InputListener implements Runnable
 
             if(input.equalsIgnoreCase(CMD_EXIT))
                 return;
+            
 
         }
     }

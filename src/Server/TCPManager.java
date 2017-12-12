@@ -30,7 +30,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
     private final ServerSocket serverTCPSocket;
      ObjectInputStream in;
      ObjectOutputStream out;
-    List<ClientPair> Pairs;
+    protected List<ClientPair> Pairs;
     static int ngames;
     
     //private final Map<Long, ClientInfo> clients;
@@ -50,6 +50,17 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
         clientHandlerThreads = new ConcurrentHashMap();
     }
     
+    public String getPairs(){
+        String listPairs="";
+        
+        for(int i=0; i<Pairs.size(); i++){
+            listPairs.concat(Pairs.get(i).toString());
+            System.out.println(Pairs.get(i).toString());
+        }
+
+        return listPairs;
+    }
+    
     @Override
     public void run()
     {
@@ -60,47 +71,44 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
         try
         {
             String temp=null;
-            Socket waiting=null;
+            Client waiting=null, next;
             Socket nextClient;
-            long clientID;
+
            // ClientHandler clientHandler;
-            Thread clientHandlerThread;
+
             
             while(!Thread.currentThread().isInterrupted())
             {
              
                 nextClient = serverTCPSocket.accept();
                 System.out.println("TCPManager: new client accepted");
-               out = new ObjectOutputStream(nextClient.getOutputStream());
+                out = new ObjectOutputStream(nextClient.getOutputStream());
                 in = new ObjectInputStream(nextClient.getInputStream());
                 
-                System.out.println("MSG........");
+                
              
                 temp= (String) in.readObject();
-                System.out.println("MSG:" + temp);
+                
 
                 if (temp.equals("TonyRamos")){
-
+                    next= new Client(nextClient, out, in);
                     out.writeObject("Login Sucessfull!");
                     out.flush();
+                    
                     if(waiting==null){
-                        waiting=nextClient;
+                        waiting=next;
                         
                     }else{
-                        Pairs.add(new ClientPair(waiting, nextClient, ngames++));
+                        Pairs.add(new ClientPair(waiting, next, ngames++));
                         waiting=null;
                         System.out.println("new pair created");
                     }
+                    
                 }
                 else
                 {
                     System.out.println("TCPManager: Rejected client, faulty login data");
                 }
-                
-                
-
-
-                
                 
 
                 

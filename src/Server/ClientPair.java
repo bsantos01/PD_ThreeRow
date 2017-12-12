@@ -5,6 +5,8 @@
  */
 package Server;
 
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.Socket;
 
 /**
@@ -13,14 +15,56 @@ import java.net.Socket;
  */
 public class ClientPair {
 
-    public ClientPair(Socket Client1, Socket Client2, int gameID) {
+    Client Client1;
+    Client Client2;
+    final int gameID;
+
+    public ClientPair(Client Client1, Client Client2, int gameID) {
         this.Client1 = Client1;
         this.Client2 = Client2;
         this.gameID = gameID;
     }
+
+    @Override
+    public String toString() {
+        return "ClientPair{" + "gameID=" + gameID + '}';
+    }
+
+    /**
+     *
+     * @return
+     */
     
-    Socket Client1;
-    Socket Client2;
-    final int gameID;
+    public Client getClient1() {
+        return Client1;
+    }
+
+    public Client getClient2() {
+        return Client2;
+    }
+
+    public int getGameID() {
+        return gameID;
+    }        
+    
+    public Socket getClientSkt(int index){
+        if(index==1)
+            return Client1.getSkt();
+        else
+            return Client2.getSkt();
+    }
+    
+    public ObjectInputStream getClientInput(int index){
+        if(index==1)
+            return Client1.getIn();
+        else
+            return Client2.getIn();
+    }
+    public ObjectOutputStream getClientOutput(int index){
+        if(index==1)
+            return Client1.getOut();
+        else
+            return Client2.getOut();
+    }
     
 }

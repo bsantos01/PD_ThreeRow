@@ -63,7 +63,12 @@ public class Server {
             stop();
         }
     }
-
+    
+    public void ListPairs(){
+        
+        System.out.println(this.tcpManager.getPairs());
+    
+    }
     
     private void startTCPManager() throws IOException
     {
@@ -79,6 +84,7 @@ public class Server {
     
     private void stopTCPManager()
     {
+        this.ListPairs();
         println("Stopping TCP Manager . . . ");
         
         tcpManagerThread.interrupt();
