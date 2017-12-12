@@ -27,8 +27,8 @@ public final class Client{
     Socket ToServer;
     String ServerAddr;
     int servicePort;
-    protected ObjectInputStream in;
-    protected ObjectOutputStream out;
+     ObjectInputStream in;
+     ObjectOutputStream out;
 
     
     public Client(String ServerAddr, String servicePort) {
@@ -39,14 +39,22 @@ public final class Client{
     }
 
     
-    public void start(){
+    public void start() throws IOException{
         
-    commThread.start();
+    
             try{
             ToServer= new Socket(this.ServerAddr, this.servicePort); 
         } catch (IOException ex) {
             System.out.println("Não foi possivel iniciar o socket");
         }
+            try{
+                out = new ObjectOutputStream(ToServer.getOutputStream());//Cria um ObjectOutputStream associado ao socket s
+                in = new ObjectInputStream(ToServer.getInputStream()); //Cria um ObjectInputStream associado ao socket s
+            }catch (IOException e){
+                System.out.println("erro ao criar streams");
+            }
+        commThread.start();
+            
     }
     
     Thread commThread = new Thread(new Runnable() {
@@ -54,11 +62,14 @@ public final class Client{
     public void run() {
         try {
             System.out.println("entrei");
-                in = new ObjectInputStream(ToServer.getInputStream());
-                out = new ObjectOutputStream(ToServer.getOutputStream());
+                out.writeObject("TonyRamos");
+                System.out.print("dude, ja mandei login");
+                String temp= (String) in.readObject();
+                System.out.println("Login: "+ temp);
                 while (!Thread.currentThread().isInterrupted()) {
-                    String temp= (String)in.readObject();
-                    System.out.print("cenas"+temp);
+                    
+                    temp= (String)in.readObject();
+                    System.out.print("MSG: "+temp);
                 }
         } catch (Exception e) {
 

@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -26,6 +28,10 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
     //TCP
     private final String serverName;
     private final ServerSocket serverTCPSocket;
+     ObjectInputStream in;
+     ObjectOutputStream out;
+    List<ClientPair> Pairs;
+    static int ngames;
     
     //private final Map<Long, ClientInfo> clients;
     //private final Map<Long, ClientHandler> clientHandlers;
@@ -34,9 +40,9 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
     public TCPManager(String serverName) throws IOException
     {
         this.serverName = serverName;
-        
+        Pairs= new ArrayList();
         serverTCPSocket = new ServerSocket(6001);
-        
+        ngames=0;
         System.out.println("Port " + serverTCPSocket.getLocalPort() + " ");
         
       //  clients = new ConcurrentHashMap();
@@ -49,10 +55,12 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
     {
         //registar instância do TCPManager para threads mais "exteriores" poderem aceder a alguns dados
        // GlobalReferences.registerReference(GlobalReferences.ReferenceType.TCP_MANAGER, this);
-                        
+
 
         try
         {
+            String temp=null;
+            Socket waiting=null;
             Socket nextClient;
             long clientID;
            // ClientHandler clientHandler;
@@ -60,35 +68,49 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
             
             while(!Thread.currentThread().isInterrupted())
             {
-                //wait for new Clients to connect
+             
                 nextClient = serverTCPSocket.accept();
-              
-
-                //clientID = System.currentTimeMillis();
-                
-                //create ClientListener Runnable and respective Thread
-               // clientHandler = new ClientHandler(this, clientID, nextClient);
-                //clientHandlerThread = new Thread(clientHandler);
-               // clientHandlerThread.setDaemon(true);
-                
-                //store thread in respective Maps
-                //clientHandlers.put(clientID, clientHandler);
-                //clientHandlerThreads.put(clientID, clientHandlerThread);
-                
-                //start thread
-                //clientHandlerThread.start();
                 System.out.println("TCPManager: new client accepted");
+               out = new ObjectOutputStream(nextClient.getOutputStream());
+                in = new ObjectInputStream(nextClient.getInputStream());
                 
-                ObjectOutputStream out = new ObjectOutputStream(nextClient.getOutputStream());
-                String temp= "cenas";
-                out.writeObject(temp);
-                out.flush();
+                System.out.println("MSG........");
+             
+                temp= (String) in.readObject();
+                System.out.println("MSG:" + temp);
+
+                if (temp.equals("TonyRamos")){
+
+                    out.writeObject("Login Sucessfull!");
+                    out.flush();
+                    if(waiting==null){
+                        waiting=nextClient;
+                        
+                    }else{
+                        Pairs.add(new ClientPair(waiting, nextClient, ngames++));
+                        waiting=null;
+                        System.out.println("new pair created");
+                    }
+                }
+                else
+                {
+                    System.out.println("TCPManager: Rejected client, faulty login data");
+                }
+                
+                
+
+
+                
+                
+
                 
             }
         }
         catch(IOException e)
         {
             //printError(e);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
         }
         finally
         {

@@ -5,6 +5,8 @@
  */
 package Client;
 
+import java.io.IOException;
+
 /**
  *
  * @author Bruno Santos
@@ -12,7 +14,7 @@ package Client;
 public class Main
 {
    
-    public static void main(String[] args) throws IllegalStateException
+    public static void main(String[] args) throws IllegalStateException, IOException
     { 
 //        if(args.length != 2)
 //        {
