@@ -1,4 +1,4 @@
-package Commons;
+package Server;
 
 import java.io.*;
 import java.net.*;
@@ -116,29 +116,30 @@ public class HeartbeatServer
         }
     }
 
-    public static void main(String[] args)
-    {
-        int listeningPort;
-        HeartbeatServer heartbeat = null;
-        try
-        {
+//    public static void main(String[] args)
+//    {
+//        int listeningPort;
+//        HeartbeatServer heartbeat = null;
+//        try
+//        {
+//
+//            listeningPort = Integer.parseInt("6999");
+//            heartbeat = new HeartbeatServer(listeningPort, true);
+//            heartbeat.processRequests();
+//
+//        } catch (NumberFormatException e)
+//        {
+//            System.out.println("O porto de escuta deve ser um inteiro positivo.");
+//        } catch (SocketException e)
+//        {
+//            System.out.println("Ocorreu um erro ao nível do socket UDP:\n\t" + e);
+//        } finally
+//        {
+//            if (heartbeat != null)
+//            {
+//                heartbeat.closeSocket();
+//            }
+//        }
+//    }
 
-            listeningPort = Integer.parseInt("6999");
-            heartbeat = new HeartbeatServer(listeningPort, true);
-            heartbeat.processRequests();
-
-        } catch (NumberFormatException e)
-        {
-            System.out.println("O porto de escuta deve ser um inteiro positivo.");
-        } catch (SocketException e)
-        {
-            System.out.println("Ocorreu um erro ao nível do socket UDP:\n\t" + e);
-        } finally
-        {
-            if (heartbeat != null)
-            {
-                heartbeat.closeSocket();
-            }
-        }
-    }
 }

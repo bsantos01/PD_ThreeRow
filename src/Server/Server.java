@@ -6,6 +6,7 @@
 package Server;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,6 +45,7 @@ public class Server {
             println("Running");
             
             startTCPManager();
+            heartbeatServer();
 
             startInputListener();
             //join InputListener (typing "exit" would interrupt it
@@ -61,6 +63,31 @@ public class Server {
         finally
         {
             stop();
+        }
+    }
+    
+    public void heartbeatServer(){
+                int listeningPort;
+        HeartbeatServer heartbeat = null;
+        try
+        {
+
+            listeningPort = Integer.parseInt("6999");
+            heartbeat = new HeartbeatServer(listeningPort, true);
+            heartbeat.processRequests();
+
+        } catch (NumberFormatException e)
+        {
+            System.out.println("O porto de escuta deve ser um inteiro positivo.");
+        } catch (SocketException e)
+        {
+            System.out.println("Ocorreu um erro ao nível do socket UDP:\n\t" + e);
+        } finally
+        {
+            if (heartbeat != null)
+            {
+                heartbeat.closeSocket();
+            }
         }
     }
     
