@@ -3,3 +3,4 @@ dist/PD_ThreeRow.jar
 *.properties
 *.class
 *.class
+build/classes/.netbeans_automatic_build

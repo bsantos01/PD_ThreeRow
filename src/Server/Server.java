@@ -6,6 +6,7 @@
 package Server;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -86,7 +87,11 @@ public class Server {
     {
         this.ListPairs();
         println("Stopping TCP Manager . . . ");
-        
+        try {
+            tcpManager.killPlayers();
+        } catch (SQLException ex) {
+            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+        }
         tcpManagerThread.interrupt();
         
         println("Stopped");
