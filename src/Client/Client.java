@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,12 +30,12 @@ public final class Client{
     int servicePort;
      ObjectInputStream in;
      ObjectOutputStream out;
-
+     Scanner sc;
     
     public Client(String ServerAddr, String servicePort) {
         this.ServerAddr = ServerAddr;
         this.servicePort = Integer.parseInt(servicePort);
-
+        sc=new Scanner(System.in);
         
     }
 
@@ -61,10 +62,11 @@ public final class Client{
     @Override
     public void run() {
         try {
-            System.out.println("entrei");
-                out.writeObject("TonyRamos");
-                System.out.print("dude, ja mandei login");
-                String temp= (String) in.readObject();
+            
+                String temp=sc.nextLine();
+                out.writeObject(temp);
+                
+                temp= (String) in.readObject();
                 System.out.println("Login: "+ temp);
                 while (!Thread.currentThread().isInterrupted()) {
                     
