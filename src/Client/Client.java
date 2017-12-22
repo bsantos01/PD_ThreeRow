@@ -13,6 +13,7 @@ import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.List;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -63,15 +64,24 @@ public final class Client{
     public void run() {
         try {
             
-                String temp=sc.nextLine();
+                Object temp=(String)sc.nextLine();
                 out.writeObject(temp);
                 
                 temp= (String) in.readObject();
                 System.out.println("Login: "+ temp);
+                
+                    temp= in.readObject();
+                    if (temp instanceof List){
+                        List<String>list=(List)temp;
+                        for(int i=0; i<list.size(); i++)
+                        System.out.print("MSG: "+list.get(i));
+                    }
+                    out.writeObject("bruno");
                 while (!Thread.currentThread().isInterrupted()) {
                     
-                    temp= (String)in.readObject();
-                    System.out.print("MSG: "+temp);
+                    temp= in.readObject();
+                    System.out.print(temp);
+                    
                 }
         } catch (Exception e) {
 
