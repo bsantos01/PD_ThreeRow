@@ -5,6 +5,7 @@
  */
 package Server;
 
+import static Server.Server.println;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -29,11 +30,10 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
     //TCP
     private final String serverName;
     private final ServerSocket serverTCPSocket;
-     ObjectInputStream in;
-     ObjectOutputStream out;
-    protected List<ClientPair> Pairs;
-    static int ngames;
+
     DBhandler uh;
+    private Thread ClientHandlerThread;
+    private ClientHandler CHandler;
     //private final Map<Long, ClientInfo> clients;
     //private final Map<Long, ClientHandler> clientHandlers;
     
@@ -41,21 +41,29 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
     public TCPManager(String serverName) throws IOException
     {
         this.serverName = serverName;
-        Pairs= new ArrayList();
+
         serverTCPSocket = new ServerSocket(6001);
-        ngames=0;
         uh= new DBhandler();
+        StartClientHandler();
         System.out.println("Port " + serverTCPSocket.getLocalPort() + " ");
         
     }
     
+    public void StartClientHandler(){
+    
+        println("Starting ClientHandler . . . ");
+        
+        CHandler = new ClientHandler();
+        ClientHandlerThread = new Thread(CHandler);
+        ClientHandlerThread.setDaemon(true);
+        ClientHandlerThread.start();
+    }
+    
+    
     public String getPairs(){
         String listPairs="";
         
-        for(int i=0; i<Pairs.size(); i++){
-            listPairs.concat(Pairs.get(i).toString());
-            System.out.println(Pairs.get(i).toString());
-        }
+
 
         return listPairs;
     }
@@ -69,51 +77,58 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
     {
         //registar instância do TCPManager para threads mais "exteriores" poderem aceder a alguns dados
        // GlobalReferences.registerReference(GlobalReferences.ReferenceType.TCP_MANAGER, this);
-
-
         try
         {
             String temp=null;
             Client waiting=null, next;
-            Socket nextClient;
-
-
-            
+   
             while(!Thread.currentThread().isInterrupted())
             {
-             
+                final ObjectInputStream in;
+                final ObjectOutputStream out;
+                final Socket nextClient;
                 nextClient = serverTCPSocket.accept();
                 System.out.println("TCPManager: new client accepted");
                 out = new ObjectOutputStream(nextClient.getOutputStream());
                 in = new ObjectInputStream(nextClient.getInputStream());
-                
-                
              
                 temp= (String) in.readObject();
-                
+
                 String[] arr = temp.split("[\\W]");
-               
-                
+
+                int control=0;
+
                 if(arr[0].equalsIgnoreCase("Register"))
                 {
                     if(uh.register(arr[1], arr[2])){
                         out.writeObject("Sucefully registered, player "+ arr[1]+".");
+                        control=1;
                     }else 
                         out.writeObject("Impossible to register.");
+                    out.flush();
                 } else
                 if(arr[0].equalsIgnoreCase("Login")){
-                    if(uh.login(arr[1], arr[2])){
+                    if(uh.login(arr[1], arr[2], nextClient.getInetAddress(), nextClient.getPort())){
                         out.writeObject("Sucefully logged in, player "+ arr[1]+".");
+                        control=1;
                     }else 
                         out.writeObject("Faulty login");
+                    out.flush();
                 } 
                 else
                 {
                     System.out.println("TCPManager: Rejected client, faulty login data");
                 }
-        
+                
+                if (control==1){
+                    
+                     
+                   
+                }     
             }
         }
+           
+        
         catch(IOException e)
         {
             //printError(e);
@@ -125,5 +140,12 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
             Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+//    	Thread commThread = new Thread(new Runnable() {
+//		@Override
+//		public void run() {
+//                    
+//		}
+//	});
   
 }
