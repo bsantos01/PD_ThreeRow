@@ -197,4 +197,25 @@ public class DBhandler {
         
         close();
     }
+
+    void setOcuppied(String string) {
+            try {
+                connect();
+                myStmt.executeUpdate("UPDATE Client SET free=false where username='"+string+"';");
+                
+                close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
+
+    void freePlayer(String string) {
+            try {
+                connect();
+                myStmt.executeUpdate("UPDATE Client SET free=true where username='"+string+"';");
+                
+                close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+            }    }
 }
