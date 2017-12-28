@@ -49,7 +49,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
         
     }
     
-    public void StartClientHandler(){
+    public void StartClientHandler() throws IOException{
     
         println("Starting ClientHandler . . . ");
         
@@ -80,7 +80,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
         try
         {
             String temp=null;
-            Client waiting=null, next;
+            
    
             while(!Thread.currentThread().isInterrupted())
             {
@@ -121,9 +121,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
                 }
                 
                 if (control==1){
-                    
-                     
-                   
+                    this.CHandler.addNewClient(arr[1], nextClient, in, out);
                 }     
             }
         }

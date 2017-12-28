@@ -39,7 +39,46 @@ public final class Client{
         sc=new Scanner(System.in);
         
     }
+    public void login() 
+    {
+        System.out.println("LOGIN PAGE");
+        System.out.println("please use comand ->login username password");
+        System.out.println("please use comand ->register username password");
+        try {
+            
+            Object temp=(String)sc.nextLine();
+            out.writeObject(temp);
+                
+            temp= (String) in.readObject();
+            System.out.println("Login: "+ temp);
+                
+            
 
+                
+
+        } catch (Exception e) {
+            System.out.println("Error during login.");
+        }  
+        
+        commThread.start();
+        ScListener();
+        
+    }
+    
+    public void ScListener(){
+        
+        while(true){
+            try {
+                System.out.println("Execute Comando");
+                Object temp=(String)sc.nextLine();
+                out.writeObject(temp);
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        
+        }
+    
+    }
     
     public void start() throws IOException{
         
@@ -55,37 +94,46 @@ public final class Client{
             }catch (IOException e){
                 System.out.println("erro ao criar streams");
             }
-        commThread.start();
+            login();
+
+        
             
     }
     
     Thread commThread = new Thread(new Runnable() {
     @Override
     public void run() {
-        try {
-            
-                Object temp=(String)sc.nextLine();
-                out.writeObject(temp);
+        while (!Thread.currentThread().isInterrupted()) {    
+            try {
+                Object temp= in.readObject();           
                 
-                temp= (String) in.readObject();
-                System.out.println("Login: "+ temp);
                 
-                    temp= in.readObject();
-                    if (temp instanceof List){
-                        List<String>list=(List)temp;
-                        for(int i=0; i<list.size(); i++)
+                if (temp instanceof List){
+                    List<String>list=(List)temp;
+                    for(int i=0; i<list.size(); i++)
                         System.out.print("MSG: "+list.get(i));
+                } 
+                else if(temp instanceof String)
+                {
+                    String msg= (String) temp;
+                    String[] arr = msg.split("[\\W]");
+                    if(arr[0].equals("gamereq"))
+                    {
+                        System.out.println("O jogador "+arr[1]+" pretende iniciar um jogo consigo. Responda! (S/N)");
                     }
-                    out.writeObject("bruno");
-                while (!Thread.currentThread().isInterrupted()) {
-                    
-                    temp= in.readObject();
-                    System.out.print(temp);
-                    
                 }
-        } catch (Exception e) {
-
-        }   
+                
+                
+                
+                
+                
+            } catch (IOException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (ClassNotFoundException ex) {
+                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+            }
+                }
+    
     }
     });
     
