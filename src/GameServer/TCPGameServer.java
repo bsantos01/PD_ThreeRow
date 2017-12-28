@@ -7,8 +7,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import logic.GameModel;
 import logic.ObservableGame;
 
@@ -16,7 +14,6 @@ public class TCPGameServer implements Runnable, Observer//, ClientHandlerCallbac
 {
 
     ObservableGame game = new ObservableGame();
-
     //TCP
     private final String serverName;
     private final ServerSocket serverTCPSocket;
@@ -46,33 +43,36 @@ public class TCPGameServer implements Runnable, Observer//, ClientHandlerCallbac
                 out = new ObjectOutputStream(client.getOutputStream());
                 in = new ObjectInputStream(client.getInputStream());
 
-                Object obj = in.readObject();
-                if (obj instanceof GameModel)
+                while (true)
                 {
-                    System.out.println("TCPGameServer: GameModel game recieved!");
-                    game.setGameModel(((GameModel) obj));
-//                        out.writeObject(game.getGameModel());
-//                        out.flush();
-                }
-                if (obj instanceof String && obj.equals("Play"))
-                {
-                    System.out.println("TCPGameServer: String to play recieved!");
-                    game.addObserver(TCPGameServer.this);
-                    game.startGame();
-//                    out.writeObject(game.getGameModel());
-//                    out.flush();
-                } else
-                {
-                    System.out.println("TCPGameServer: Rejected content!");
-                    System.err.println("Was: " + obj);
+                    Object obj = in.readObject();
+                    if (obj instanceof GameModel)
+                    {
+                        System.out.println("TCPGameServer: GameModel game recieved!");
+                        game.setGameModel(((GameModel) obj));
+                        Thread.sleep(1000);
+                    }
+                    if (obj instanceof String && obj.equals("Play"))
+                    {
+                        System.out.println("TCPGameServer: String to play recieved!");
+                        game.addObserver(TCPGameServer.this);
+                        game.startGame();
+                    } else
+                    {
+                        System.out.println("TCPGameServer: Rejected content!");
+                        System.err.println("TCPGameServer: Recieved: " + obj.toString());
+                    }
                 }
             }
         } catch (IOException e)
         {
-            System.out.println("TCPGameServer: IOException: " + e);
+            System.err.println("TCPGameServer: IOException: " + e);
         } catch (ClassNotFoundException ex)
         {
-            System.out.println("TCPGameServer: ClassNotFoundException: " + ex);
+            System.err.println("TCPGameServer: ClassNotFoundException: " + ex);
+        } catch (InterruptedException ex)
+        {
+            System.err.println("GameClient InterruptedException" + ex);
         }
     }
 

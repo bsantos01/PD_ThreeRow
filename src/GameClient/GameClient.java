@@ -6,8 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.util.Observable;
 import java.util.Observer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import logic.GameModel;
 import logic.ObservableGame;
 import ui.gui.ThreeInRowView;
@@ -67,47 +65,50 @@ public final class GameClient implements Observer
 //                System.out.println("Login complete... ");
                 while (!Thread.currentThread().isInterrupted())
                 {
-                    Object obj = in.readObject();
-                    if (obj instanceof GameModel)
+                    while (true)
                     {
-                        if (game == null)
+                        Object obj = in.readObject();
+                        if (obj instanceof GameModel)
                         {
-                            System.out.print("Yesh, i was null...");
-                            game = new ObservableGame();
-                            game.setGameModel(((GameModel) obj));
-                            System.out.print("GameClient: GameModel arrived!");
-                            ThreeInRowView GUI = new ThreeInRowView(game);
-                            game.addObserver(GameClient.this);
+                            if (game == null)
+                            {
+                                System.out.print("GameClient: Yesh, i was null... but no longer!");
+                                game = new ObservableGame();
+                                game.setGameModel(((GameModel) obj));
+                                game.addObserver(GameClient.this);
 
-//                            if (GUI.getGame().hasChanged())
-//                            {
-//                                System.out.println("GameClient: GameModel game sent [hasChanged]!");
-//                                //game.setGameModel(((GameModel) obj));
-//                                out.writeObject(game.getGameModel());
-//                                out.flush();
-//                            }
+                                System.out.print("GameClient: GameModel arrived!");
+                                ThreeInRowView GUI = new ThreeInRowView(game);
+                            } else
+                            {
+                                System.out.print("GameClient: Recieved a GameModel.");
+                                game.setGameModel(((GameModel) obj));
+                                Thread.sleep(1000);
+                            }
+                        } else
+                        {
+                            System.out.print("GameClient: I don't really know what this is...");
                         }
-                    } else
-                    {
-                        System.out.print("GameClient: I don't really know what this is...");
                     }
 
                 }
             } catch (IOException | ClassNotFoundException e)
             {
                 System.err.println("GameClient Exception" + e);
+            } catch (InterruptedException ex)
+            {
+                System.err.println("GameClient InterruptedException" + ex);
             }
         }
     });
 
-     @Override
+    @Override
     public void update(Observable o, Object arg)
     {
         try
         {
             System.out.println("GameClient: GameModel game sent [update]!");
-            GameModel gg = game.getGameModel();
-            out.writeObject(gg);
+            out.writeObject(game.getGameModel());
             out.flush();
         } catch (IOException ex)
         {
