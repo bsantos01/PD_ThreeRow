@@ -149,14 +149,13 @@ public final class GameClient implements Observer, Runnable
 
     }
 
-     @Override
+    @Override
     public void update(Observable o, Object arg)
     {
         try
         {
             System.out.println("GameClient: GameModel game sent [update]!");
-            GameModel gg = game.getGameModel();
-            out.writeObject(gg);
+            out.writeObject(game.getGameModel());
             out.flush();
         } catch (IOException ex)
         {
