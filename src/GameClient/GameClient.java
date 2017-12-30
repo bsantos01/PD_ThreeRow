@@ -123,7 +123,9 @@ public final class GameClient implements Observer, Runnable
 
                 while (true)
                 {
+                    System.out.println("GameClient: Inside While(true) condition!");
                     Object obj = in.readObject();
+                    System.out.println("GameClient: readObject()");
                     objectUpdate(obj);
                     System.out.println("GameClient: objectUpdate(obj)");
 
