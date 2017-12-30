@@ -1,6 +1,7 @@
 package GameServer;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.ObservableGame;
@@ -8,18 +9,20 @@ import logic.ObservableGame;
 public class GameServer
 {
 
-    private String serverName;
     private boolean hasStarted;
     private Thread tcpManagerThread;
     private TCPGameServer tcpGameServer;
-    private final String serviceAddress;
+    private InetAddress serviceAddress;
+    private InetAddress serviceAddress2;
     private final int servicePort;
+    private final int servicePort2;
 
-    public GameServer(String serverName, String serviceAddress, int servicePort)
+    public GameServer(InetAddress serviceAddress, String servicePort, InetAddress serviceAddress2, String servicePort2)
     {
-        this.serverName = serverName;
         this.serviceAddress = serviceAddress;
-        this.servicePort = servicePort;
+        this.serviceAddress2 = serviceAddress2;
+        this.servicePort = Integer.parseInt(servicePort);
+        this.servicePort2 = Integer.parseInt(servicePort2);
         this.hasStarted = false;
     }
 
@@ -36,7 +39,7 @@ public class GameServer
         try
         {
             println("Running");
-            startTCPGameServer(servicePort);
+            startTCPGameServer();
 //            heartbeatClient();
             tcpManagerThread.join();
 
@@ -58,11 +61,11 @@ public class GameServer
 
     }
 
-    private void startTCPGameServer(int servicePort) throws IOException
+    private void startTCPGameServer() throws IOException
     {
         println("Starting TCPGameServer . . . ");
 
-        tcpGameServer = new TCPGameServer(serverName, servicePort);
+        tcpGameServer = new TCPGameServer(serviceAddress, servicePort, serviceAddress2, servicePort2);
         tcpManagerThread = new Thread(tcpGameServer);
         tcpManagerThread.setDaemon(true);
         tcpManagerThread.start();
@@ -76,7 +79,6 @@ public class GameServer
         tcpManagerThread.interrupt();
         println("Stopped");
     }
-    
 
     public void stop() throws IllegalStateException
     {
