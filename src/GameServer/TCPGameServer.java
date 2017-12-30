@@ -23,6 +23,7 @@ public class TCPGameServer implements Runnable
 
     //Atempt
     boolean playerOne = true;
+    boolean locking = true;
     int players = 0;
 
     public TCPGameServer(InetAddress cOneAdress, int cOneport, InetAddress cTwoAdress, int cTwoport)
@@ -47,8 +48,12 @@ public class TCPGameServer implements Runnable
         {
             cOneOut = new ObjectOutputStream(cOne.getOutputStream());
             cOneIn = new ObjectInputStream(cOne.getInputStream());
-            cTwoOut = new ObjectOutputStream(cOne.getOutputStream());
-            cTwoIn = new ObjectInputStream(cOne.getInputStream());
+
+            cTwoOut = new ObjectOutputStream(cTwo.getOutputStream());
+            cTwoIn = new ObjectInputStream(cTwo.getInputStream());
+
+            System.out.println("TCPGameServer: Streams are up! ");
+
         } catch (IOException e)
         {
             System.out.println("TCPGameServer: Error creating streams.");
@@ -62,10 +67,15 @@ public class TCPGameServer implements Runnable
             if (obj.equals("Ok") && players == 1)
             {
                 game = new Game();
+                System.err.println("TCPGameServer: PlayerTwo Ok recieved!! ");
+                System.err.println("TCPGameServer: Both players ready! ");
+                locking=false;
             }
             if (obj.equals("Ok") && players == 0) //not shure about this, it's here to validate 
             {
                 players = 1;
+                System.err.println("TCPGameServer: PlayerOne Ok recieved! ");
+
             } else
             {
                 System.err.println("TCPGameServer: An unexpected string arrived...");
@@ -93,6 +103,8 @@ public class TCPGameServer implements Runnable
         {
             System.err.println("TCPGameServer: updateGame IOException: " + ex);
         }
+        System.out.println("TCPGameServer: updateGame(out, obj) sent! ");
+
     }
 
     @Override
@@ -108,7 +120,13 @@ public class TCPGameServer implements Runnable
 
                 while (true) // insert condition to end while
                 {
-                    if (playerOne)
+                    if (playerOne && locking)
+                    {
+                        Object obj = cOneIn.readObject();
+                        objectUpdate(obj);
+                        playerOne = false;
+                    }
+                    if (playerOne && !locking)
                     {
                         Object obj = cOneIn.readObject();
                         objectUpdate(obj);

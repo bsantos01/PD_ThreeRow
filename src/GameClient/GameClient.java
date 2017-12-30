@@ -17,23 +17,25 @@ public final class GameClient implements Observer, Runnable
     ObservableGame game;
 
     ServerSocket clientServer;
-    Socket server;
+    Socket socket ;
     int servicePort;
 
     ObjectInputStream in;
     ObjectOutputStream out;
 
-    public GameClient(String servicePort)
+    public GameClient(String servicePort) throws IOException
     {
         this.servicePort = Integer.parseInt(servicePort);
+        clientServer = new ServerSocket(this.servicePort);
+        System.out.println("ServerSocket started @Port " + clientServer.getLocalPort() + " ");
     }
 
     public void startStreams()
     {
         try
         {
-            out = new ObjectOutputStream(server.getOutputStream());
-            in = new ObjectInputStream(server.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
+            in = new ObjectInputStream(socket.getInputStream());
 
         } catch (IOException ex)
         {
@@ -50,6 +52,7 @@ public final class GameClient implements Observer, Runnable
             {
                 System.out.println("GameClient: String to play recieved!");
                 updateGame("Ok");
+                System.out.println("GameClient: String OK sent!");
             } else
             {
                 System.out.println("GameClient: An unexpected string arrived...");
@@ -99,7 +102,7 @@ public final class GameClient implements Observer, Runnable
             {
                 try
                 {
-                    server = clientServer.accept();
+                    socket = clientServer.accept();
                     System.out.println("GameClient: GameServer accepted");
                     startStreams();
 
@@ -110,15 +113,19 @@ public final class GameClient implements Observer, Runnable
 
                 while (true)
                 {
+                    System.out.println("GameClient: Inside While(true) condition!");
                     Object obj = in.readObject();
+                    System.out.println("GameClient: readObject()");
                     objectUpdate(obj);
+                    System.out.println("GameClient: objectUpdate(obj)");
+                    
                     //if all goes according to plan the update from oberver takes care of every thing
 
                 }
             }
         } catch (IOException e)
         {
-            System.err.println("GameClient: IOException: " + e);
+            System.err.println("GameClient: run() IOException: " + e);
         } catch (ClassNotFoundException ex)
         {
             System.err.println("GameClient: ClassNotFoundException: " + ex);

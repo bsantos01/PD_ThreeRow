@@ -38,7 +38,7 @@ public class GameServer
 
         try
         {
-            println("Running");
+            println("GameServer Running");
             startTCPGameServer();
 //            heartbeatClient();
             tcpManagerThread.join();
