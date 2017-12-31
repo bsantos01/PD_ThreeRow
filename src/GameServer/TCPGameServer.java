@@ -196,11 +196,17 @@ public class TCPGameServer implements Runnable
 
                 while (!stop) // insert condition to end while
                 {
-                    if (playerOne && locking)
+                    if (playerOne)
                     {
                         Object obj = cOneIn.readObject();
-                        objectUpdate(obj);
+
+                        if (game != null)
+                        {
+                            objectUpdate(obj);
+                            updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
+                        }
                         playerOne = false;
+
                     }
                     if (playerOne && !locking)
                     {
