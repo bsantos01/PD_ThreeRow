@@ -29,9 +29,9 @@ public class Game implements Observer
     }
 
     @Override
-    public void update(Observable o, Object arg)
+    public synchronized void update(Observable o, Object arg)
     {
-        System.err.println("Game: inside update!");
+        System.out.println("Game: update!");
     }
 
 }

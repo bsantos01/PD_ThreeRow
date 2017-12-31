@@ -23,8 +23,6 @@ public class TCPGameServer implements Runnable
 
     //Atempt
     boolean playerOne = true;
-    boolean locking = true;
-    int players = 0;
 
     public TCPGameServer(InetAddress cOneAdress, int cOneport, InetAddress cTwoAdress, int cTwoport)
     {
@@ -64,18 +62,10 @@ public class TCPGameServer implements Runnable
     {
         if (obj instanceof String)
         {
-            if (obj.equals("Ok") && players == 1)
+            if (((String) obj).equalsIgnoreCase("Ok"))
             {
                 game = new Game();
-                System.err.println("TCPGameServer: PlayerTwo Ok recieved!! ");
-                System.err.println("TCPGameServer: Both players ready! ");
-                locking=false;
-            }
-            if (obj.equals("Ok") && players == 0) //not shure about this, it's here to validate 
-            {
-                players = 1;
-                System.err.println("TCPGameServer: PlayerOne Ok recieved! ");
-
+                System.out.println("TCPGameServer: Both players ready! ");
             } else
             {
                 System.err.println("TCPGameServer: An unexpected string arrived...");
@@ -83,17 +73,18 @@ public class TCPGameServer implements Runnable
             // end conditions?
             //socket disconnected conditions?
         }
-        if (obj instanceof GameModel)
+        else if (obj instanceof GameModel)
         {
+
             System.out.print("TCPGameServer: Recieved a GameModel.");
             game.setGame((GameModel) obj);
         } else
         {
-            System.out.print("TCPGameServer: I don't really know what this is...");
+            System.err.print("TCPGameServer: I don't really know what this is..." + obj.toString() +" ");
         }
     }
 
-    public void updateGame(ObjectOutputStream out, Object obj)
+    public void updatePlayers(ObjectOutputStream out, Object obj)
     {
         try
         {
@@ -103,7 +94,7 @@ public class TCPGameServer implements Runnable
         {
             System.err.println("TCPGameServer: updateGame IOException: " + ex);
         }
-        System.out.println("TCPGameServer: updateGame(out, obj) sent! ");
+        System.out.println("TCPGameServer: updateGame sent! ");
 
     }
 
@@ -115,30 +106,41 @@ public class TCPGameServer implements Runnable
             while (!Thread.currentThread().isInterrupted())
             {
                 startStreams();
-                updateGame(cOneOut, "Play");
-                updateGame(cTwoOut, "Play");
+                updatePlayers(cOneOut, "Player1");
+                updatePlayers(cTwoOut, "Player2");
 
                 while (true) // insert condition to end while
                 {
-                    if (playerOne && locking)
+                    if (playerOne)
                     {
                         Object obj = cOneIn.readObject();
-                        objectUpdate(obj);
+
+                        if (game != null)
+                        {
+                            objectUpdate(obj);
+                            updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
+                        }
                         playerOne = false;
+
                     }
-                    if (playerOne && !locking)
-                    {
-                        Object obj = cOneIn.readObject();
-                        objectUpdate(obj);
-                        playerOne = false;
-                        updateGame(cTwoOut, game.getGame()); //sends new gameModel to player two
-                    }
-                    if (!playerOne)
+                    else if (!playerOne)
                     {
                         Object obj = cTwoIn.readObject();
-                        objectUpdate(obj);
-                        playerOne = true;
-                        updateGame(cOneOut, game.getGame()); //sends new gameModel to player one
+                        if (game == null)
+                        {
+                            objectUpdate(obj);
+                            updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
+                            updatePlayers(cOneOut, game.getGame()); //sends new gameModel to player one
+                            playerOne = true;
+
+                        } else
+                        {
+                            objectUpdate(obj);
+                            updatePlayers(cOneOut, game.getGame()); //sends new gameModel to player one
+                            playerOne = true;
+
+                        }
+
                     } else
                     {
                         System.out.println("TCPGameServer: Rejected content!");
