@@ -35,7 +35,7 @@ public class TCPGameServer implements Runnable
 
         } catch (IOException e)
         {
-            System.out.println("TCPGameServer: Error creating sockets.");
+            System.err.println("TCPGameServer: Error creating sockets. INSURE CLIENTS ARE RUNNING!");
         }
     }
 
@@ -112,18 +112,6 @@ public class TCPGameServer implements Runnable
                 while (true) // insert condition to end while
                 {
                     if (playerOne)
-                    {
-                        Object obj = cOneIn.readObject();
-
-                        if (game != null)
-                        {
-                            objectUpdate(obj);
-                            updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
-                        }
-                        playerOne = false;
-
-                    }
-                    if (playerOne && !locking)
                     {
                         Object obj = cOneIn.readObject();
 
