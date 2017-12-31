@@ -202,18 +202,6 @@ public class TCPGameServer implements Runnable
 
                         if (game != null)
                         {
-                            objectUpdate(obj);
-                            updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
-                        }
-                        playerOne = false;
-
-                    }
-                    if (playerOne && !locking)
-                    {
-                        Object obj = cOneIn.readObject();
-
-                        if (game != null)
-                        {
                             if (game.getGame().isOver())
                             {
                                 updatePlayers(cTwoOut, game.getGame());

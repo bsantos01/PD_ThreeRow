@@ -141,15 +141,6 @@ public final class GameClient implements Observer, Runnable
     }
 
     @Override
-    public synchronized void update(Observable o, Object arg)
-    {
-        System.out.println("GameClient: GameModel game sent [update]!");
-        updateGame(game.getGameModel());
-        notify();
-
-    }
-
-    @Override
     public void update(Observable o, Object arg)
     {
         System.out.println("GameClient: GameModel game sent [update]!");
