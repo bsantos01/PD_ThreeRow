@@ -14,6 +14,7 @@ import ui.gui.ThreeInRowView;
 public final class GameClient implements Observer, Runnable
 {
 
+    
     ObservableGame game;
     ThreeInRowView gui;
 
@@ -158,6 +159,7 @@ public final class GameClient implements Observer, Runnable
         if (game.hasWon(game.getCurrentPlayer()))
         {
             updateGame(game.getGameModel());
+            
         }
     }
 
