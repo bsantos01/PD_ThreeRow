@@ -6,11 +6,9 @@ import java.awt.Container;
 import java.awt.Dimension;
 import java.util.Observable;
 import java.util.Observer;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
 
 public class ThreeInRowView extends JFrame implements Observer
 {
@@ -54,6 +52,12 @@ public class ThreeInRowView extends JFrame implements Observer
     public void enableGrid(boolean b)
     {
         panel.enableGrid(b);
+    }
+
+    public void close()
+    {
+        setVisible(false); //you can't see me!
+        dispose(); //Destroy the JFrame object
     }
 
     @Override

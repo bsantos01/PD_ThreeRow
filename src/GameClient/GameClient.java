@@ -5,6 +5,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 import logic.GameModel;
@@ -14,7 +15,6 @@ import ui.gui.ThreeInRowView;
 public final class GameClient implements Observer, Runnable
 {
 
-    
     ObservableGame game;
     ThreeInRowView gui;
 
@@ -26,6 +26,7 @@ public final class GameClient implements Observer, Runnable
     ObjectOutputStream out;
 
     String player = null;
+    private boolean running = false;
 
     public GameClient(String servicePort) throws IOException
     {
@@ -48,7 +49,7 @@ public final class GameClient implements Observer, Runnable
         }
     }
 
-    public void objectUpdate(Object obj)
+    public void objectUpdate(Object obj) throws InterruptedException, IOException
     {
         if (obj instanceof String)
         {
@@ -66,7 +67,15 @@ public final class GameClient implements Observer, Runnable
                 System.out.println("GameClient: String OK sent!");
             } else
             {
-                System.out.println("GameClient: An unexpected string arrived...");
+                if (obj.equals("GAMEOVER"))
+                {
+                    System.out.println("GameClient: GAMEOVER arrived...");
+                    shutdown();
+
+                } else
+                {
+                    System.out.println("GameClient: An unexpected string arrived..." + obj + "");
+                }
             }
         }
         if (obj instanceof GameModel)
@@ -86,14 +95,36 @@ public final class GameClient implements Observer, Runnable
                 }
             } else
             {
-                System.out.print("GameClient: Recieved a GameModel. " + game.getCurrentPlayerName() + "");
+                System.out.print("GameClient: Recieved a GameModel. " + game.getCurrentPlayerName() + " ");
                 game.setGameModel(((GameModel) obj));
             }
         } else
         {
-            System.out.print("GameClient: I don't really know what this is...");
+            System.out.print("GameClient: I don't really know what this is... " + obj.toString() + " ");
         }
 
+    }
+
+    public void shutdown()
+    {
+        try
+        {
+            updateGame("CLOSING");
+            out.close();
+            in.close();
+            socket.close();
+            clientServer.close();
+            running = true;
+            Thread.sleep(2000);
+            gui.close();
+            Thread.currentThread().interrupt();
+        } catch (IOException ex)
+        {
+            System.out.print("GameClient: Shutdown error " + ex + "");
+        } catch (InterruptedException ex)
+        {
+            System.out.print("GameClient: interrupted Shutdown error " + ex + "");
+        }
     }
 
     public void updateGame(Object obj)
@@ -126,13 +157,12 @@ public final class GameClient implements Observer, Runnable
                     System.out.println("GameClient: Error starting socket.");
                 }
 
-                while (true)
+                while (!running)
                 {
                     Object obj = in.readObject();
                     objectUpdate(obj);
                     System.out.println("GameClient: objectUpdate(obj)");
 
-                    //if all goes according to plan the update from oberver takes care of every thing
                 }
             }
         } catch (IOException e)
@@ -141,8 +171,25 @@ public final class GameClient implements Observer, Runnable
         } catch (ClassNotFoundException ex)
         {
             System.err.println("GameClient: ClassNotFoundException: " + ex + "");
+        } catch (InterruptedException ex)
+        {
+            System.err.println("GameClient: InterruptedException: " + ex + "");
         }
-
+//        finally
+//        {
+//            try
+//            {
+//                out.writeObject("CLOSED");
+//                out.flush();
+//
+//                System.out.println("GameClient: Socket closed at: " + new Date(System.currentTimeMillis()));
+//                shutdown();
+//
+//            } catch (IOException e)
+//            {
+//                System.out.println("GameClient: Error on finally " + e + "");
+//            }
+//        }
     }
 
     @Override
@@ -159,7 +206,7 @@ public final class GameClient implements Observer, Runnable
         if (game.hasWon(game.getCurrentPlayer()))
         {
             updateGame(game.getGameModel());
-            
+
         }
     }
 

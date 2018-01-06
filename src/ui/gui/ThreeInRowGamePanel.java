@@ -27,7 +27,7 @@ public class ThreeInRowGamePanel extends JPanel
 
     private void setupComponents()
     {
-        optionPanel = new StartOptionPanel(game);
+        //optionPanel = new StartOptionPanel(game);
         theGrid = new GameGrid(game);
         pd1 = new PlayerData(game, 1);
         pd2 = new PlayerData(game, 2);
@@ -51,7 +51,7 @@ public class ThreeInRowGamePanel extends JPanel
 
         add(pCenter, BorderLayout.CENTER);
 
-        add(optionPanel, BorderLayout.EAST);
+        //add(optionPanel, BorderLayout.EAST);
 
         validate();
     }

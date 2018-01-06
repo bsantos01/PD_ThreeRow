@@ -5,6 +5,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import logic.GameModel;
 
 public class TCPGameServer implements Runnable
@@ -23,6 +25,7 @@ public class TCPGameServer implements Runnable
 
     //Atempt
     boolean playerOne = true;
+    private boolean stop = false;
 
     public TCPGameServer(InetAddress cOneAdress, int cOneport, InetAddress cTwoAdress, int cTwoport)
     {
@@ -68,6 +71,12 @@ public class TCPGameServer implements Runnable
                 System.out.println("TCPGameServer: Both players ready! ");
             } else
             {
+                if (((String) obj).equalsIgnoreCase("CLOSING"))
+                {
+                    shutdownStreams();
+                }
+            }
+            {
                 System.err.println("TCPGameServer: An unexpected string arrived...");
             }
             // end conditions?
@@ -99,6 +108,38 @@ public class TCPGameServer implements Runnable
 
     }
 
+    public void shutdownGame(ObjectOutputStream one, ObjectOutputStream two)
+    {
+        updatePlayers(one, "GAMEOVER");
+        updatePlayers(two, "GAMEOVER");
+    }
+
+    public void shutdownStreams()
+    {
+
+        try
+        {
+            shutdownGame(cOneOut, cTwoOut);
+
+            cOneIn.close();
+            cOneOut.close();
+            cTwoIn.close();
+            cTwoOut.close();
+            stop = true;
+            Thread.sleep(2000);
+            cOne.close();
+            cTwo.close();
+            Thread.currentThread().interrupt();
+        } catch (IOException ex)
+        {
+            System.out.print("GameClient: Shutdown error " + ex + "");
+        } catch (InterruptedException ex)
+        {
+            System.out.print("GameClient: interrupted Shutdown error " + ex + "");
+        }
+
+    }
+
     @Override
     public void run()
     {
@@ -110,7 +151,7 @@ public class TCPGameServer implements Runnable
                 updatePlayers(cOneOut, "Player1");
                 updatePlayers(cTwoOut, "Player2");
 
-                while (true) // insert condition to end while
+                while (!stop) // insert condition to end while
                 {
                     if (playerOne)
                     {
@@ -121,9 +162,11 @@ public class TCPGameServer implements Runnable
                             if (game.getGame().isOver())
                             {
                                 updatePlayers(cTwoOut, game.getGame());
+                                shutdownGame(cOneOut, cTwoOut);
                             }
                             objectUpdate(obj);
                             updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
+
                         }
                         playerOne = false;
 
@@ -144,6 +187,8 @@ public class TCPGameServer implements Runnable
                                 if (game.getGame().isOver())
                                 {
                                     updatePlayers(cOneOut, game.getGame());
+                                    shutdownGame(cOneOut, cTwoOut);
+
                                 } else
                                 {
                                     objectUpdate(obj);
@@ -162,6 +207,8 @@ public class TCPGameServer implements Runnable
             }
         } catch (IOException e)
         {
+            //Sockets closed abruptly
+            System.err.println("To the database and beyond!!!");
             System.err.println("TCPGameServer: IOException: " + e);
         } catch (ClassNotFoundException ex)
         {
