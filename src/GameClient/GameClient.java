@@ -1,5 +1,6 @@
 package GameClient;
 
+import java.awt.PopupMenu;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -69,6 +70,7 @@ public final class GameClient implements Observer, Runnable
                 if (obj.equals("GAMEOVER"))
                 {
                     System.out.println("GameClient: GAMEOVER arrived...");
+                    //warn the client?!?
                     shutdown();
 
                 } else
@@ -110,6 +112,7 @@ public final class GameClient implements Observer, Runnable
     {
         try
         {
+            //how to show client?
             updateGame("CLOSING");
             out.close();
             in.close();
@@ -161,9 +164,8 @@ public final class GameClient implements Observer, Runnable
 
                 } catch (IOException ex)
                 {
-                    System.out.println("GameClient: Error starting socket.");
+                    System.out.println("GameClient: Error starting socket." + ex + " ");
                 }
-
                 while (!running)
                 {
                     Object obj = in.readObject();
@@ -202,6 +204,7 @@ public final class GameClient implements Observer, Runnable
     @Override
     public void update(Observable o, Object arg)
     {
+
         if (!game.getCurrentPlayerName().equals(player))
         {
             updateGame(game.getGameModel());
@@ -215,6 +218,6 @@ public final class GameClient implements Observer, Runnable
             updateGame(game.getGameModel());
 
         }
-    }
 
+    }
 }

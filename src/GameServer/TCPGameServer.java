@@ -1,5 +1,7 @@
 package GameServer;
 
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -102,24 +104,33 @@ public class TCPGameServer implements Runnable
             out.flush();
         } catch (IOException ex)
         {
-            System.err.println("TCPGameServer: updateGame IOException: " + ex);
+            System.err.println("TCPGameServer: updateGame IOException: " + ex + " obj: " + obj);
         }
         System.out.println("TCPGameServer: updateGame sent! ");
 
     }
 
-    public void shutdownGame(ObjectOutputStream one, ObjectOutputStream two)
-    {
-        updatePlayers(one, "GAMEOVER");
-        updatePlayers(two, "GAMEOVER");
-    }
-
+//    public void shutdownGame(ObjectOutputStream one, ObjectOutputStream two)
+//    {
+//        updatePlayers(one, "GAMEOVER");
+//        updatePlayers(two, "GAMEOVER");
+//    }
     public void shutdownStreams()
     {
 
         try
         {
-            shutdownGame(cOneOut, cTwoOut);
+            if (cOneOut != null)
+            {
+                updatePlayers(cOneOut, "GAMEOVER");
+                System.out.print("cOneOut, GAMEOVER");
+            }
+            if (cTwoOut != null)
+            {
+                updatePlayers(cTwoOut, "GAMEOVER");
+                System.out.print("cTwoOut, GAMEOVER");
+            }
+            //shutdownGame(cOneOut, cTwoOut);
             Thread.sleep(1000);
 
             cOneIn.close();
@@ -139,10 +150,10 @@ public class TCPGameServer implements Runnable
             Thread.currentThread().interrupt();
         } catch (IOException ex)
         {
-            System.out.print("GameClient: Shutdown error " + ex + "");
+            System.out.print("TCPGameServer: Shutdown error " + ex + "");
         } catch (InterruptedException ex)
         {
-            System.out.print("GameClient: interrupted Shutdown error " + ex + "");
+            System.out.print("TCPGameServer: interrupted Shutdown error " + ex + "");
         }
 
     }
@@ -216,7 +227,10 @@ public class TCPGameServer implements Runnable
         } catch (IOException e)
         {
             //Sockets closed abruptly
+            shutdownStreams();
+
             System.err.println("To the database and beyond!!!");
+
             System.err.println("TCPGameServer: IOException: " + e);
         } catch (ClassNotFoundException ex)
         {
