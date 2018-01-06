@@ -5,7 +5,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
 import logic.GameModel;
@@ -77,30 +76,32 @@ public final class GameClient implements Observer, Runnable
                     System.out.println("GameClient: An unexpected string arrived..." + obj + "");
                 }
             }
-        }
-        if (obj instanceof GameModel)
+        } else
         {
-            if (game == null)
+            if (obj instanceof GameModel)
             {
-                System.out.print("GameClient: Yesh, i was null... but no longer!");
-                game = new ObservableGame();
-                game.setGameModel(((GameModel) obj));
-                game.addObserver(GameClient.this);
-
-                System.out.print("GameClient: GameModel arrived! ");
-                gui = new ThreeInRowView(game, player);
-                if (!game.getCurrentPlayerName().equals(player))
+                if (game == null)
                 {
-                    gui.enableGrid(false);
+                    System.out.print("GameClient: Yesh, i was null... but no longer!");
+                    game = new ObservableGame();
+                    game.setGameModel(((GameModel) obj));
+                    game.addObserver(GameClient.this);
+
+                    System.out.print("GameClient: GameModel arrived! ");
+                    gui = new ThreeInRowView(game, player);
+                    if (!game.getCurrentPlayerName().equals(player))
+                    {
+                        gui.enableGrid(false);
+                    }
+                } else
+                {
+                    System.out.print("GameClient: Recieved a GameModel. " + game.getCurrentPlayerName() + " ");
+                    game.setGameModel(((GameModel) obj));
                 }
             } else
             {
-                System.out.print("GameClient: Recieved a GameModel. " + game.getCurrentPlayerName() + " ");
-                game.setGameModel(((GameModel) obj));
+                System.out.print("GameClient: I don't really know what this is... " + obj.toString() + " ");
             }
-        } else
-        {
-            System.out.print("GameClient: I don't really know what this is... " + obj.toString() + " ");
         }
 
     }
@@ -112,8 +113,14 @@ public final class GameClient implements Observer, Runnable
             updateGame("CLOSING");
             out.close();
             in.close();
-            socket.close();
-            clientServer.close();
+            if (socket != null)
+            {
+                socket.close();
+            }
+            if (clientServer != null)
+            {
+                clientServer.close();
+            }
             running = true;
             Thread.sleep(2000);
             gui.close();

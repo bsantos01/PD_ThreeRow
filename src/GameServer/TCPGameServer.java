@@ -74,10 +74,10 @@ public class TCPGameServer implements Runnable
                 if (((String) obj).equalsIgnoreCase("CLOSING"))
                 {
                     shutdownStreams();
+                } else
+                {
+                    System.err.println("TCPGameServer: An unexpected string arrived..." + obj + " ");
                 }
-            }
-            {
-                System.err.println("TCPGameServer: An unexpected string arrived...");
             }
             // end conditions?
             //socket disconnected conditions?
@@ -120,15 +120,22 @@ public class TCPGameServer implements Runnable
         try
         {
             shutdownGame(cOneOut, cTwoOut);
+            Thread.sleep(1000);
 
             cOneIn.close();
             cOneOut.close();
             cTwoIn.close();
             cTwoOut.close();
             stop = true;
-            Thread.sleep(2000);
-            cOne.close();
-            cTwo.close();
+            Thread.sleep(1000);
+            if (cOne != null)
+            {
+                cOne.close();
+            }
+            if (cTwo != null)
+            {
+                cTwo.close();
+            }
             Thread.currentThread().interrupt();
         } catch (IOException ex)
         {
@@ -145,6 +152,7 @@ public class TCPGameServer implements Runnable
     {
         try
         {
+            //start streams here?
             while (!Thread.currentThread().isInterrupted())
             {
                 startStreams();
@@ -162,7 +170,7 @@ public class TCPGameServer implements Runnable
                             if (game.getGame().isOver())
                             {
                                 updatePlayers(cTwoOut, game.getGame());
-                                shutdownGame(cOneOut, cTwoOut);
+                                shutdownStreams();
                             }
                             objectUpdate(obj);
                             updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
@@ -187,7 +195,7 @@ public class TCPGameServer implements Runnable
                                 if (game.getGame().isOver())
                                 {
                                     updatePlayers(cOneOut, game.getGame());
-                                    shutdownGame(cOneOut, cTwoOut);
+                                    shutdownStreams();
 
                                 } else
                                 {
@@ -214,5 +222,6 @@ public class TCPGameServer implements Runnable
         {
             System.err.println("TCPGameServer: ClassNotFoundException: " + ex);
         }
+
     }
 }
