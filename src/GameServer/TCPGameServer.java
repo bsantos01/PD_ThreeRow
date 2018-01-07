@@ -1,10 +1,15 @@
 package GameServer;
 
+import files.FileUtility;
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import logic.GameModel;
 
 public class TCPGameServer implements Runnable
@@ -15,13 +20,15 @@ public class TCPGameServer implements Runnable
     private Socket cTwo = null;
     private Game game;
 
+    String fileName = "";
+    File file;
+
     ObjectInputStream cOneIn;
     ObjectOutputStream cOneOut;
 
     ObjectInputStream cTwoIn;
     ObjectOutputStream cTwoOut;
 
-    //Atempt
     boolean playerOne = true;
     private boolean stop = false;
 
@@ -38,6 +45,8 @@ public class TCPGameServer implements Runnable
         {
             System.err.println("TCPGameServer: Error creating sockets. INSURE CLIENTS ARE RUNNING!");
         }
+        long num = System.currentTimeMillis();
+        fileName = "savedgame" + num + ".bin";
     }
 
 //    stream start for both clients
@@ -87,6 +96,7 @@ public class TCPGameServer implements Runnable
             {
                 System.out.print("TCPGameServer: Recieved a GameModel.");
                 game.setGame((GameModel) obj);
+                saveFile();
             } else
             {
                 System.err.print("TCPGameServer: I don't really know what this is..." + obj.toString() + " ");
@@ -140,7 +150,10 @@ public class TCPGameServer implements Runnable
             cTwoIn.close();
             cTwoOut.close();
             stop = true;
+
             Thread.sleep(1000);
+            deleteFile();
+
             cOne.close();
             cTwo.close();
             Thread.currentThread().interrupt();
@@ -152,6 +165,30 @@ public class TCPGameServer implements Runnable
             System.out.print("TCPGameServer: interrupted Shutdown error " + ex + " ");
         }
 
+    }
+
+    public void saveFile()
+    {
+        try
+        {
+            file = new File(fileName);
+            FileUtility.saveGameToFile(file, game.getGame());
+            System.out.println("TCPGameServer: Game saved as file!");
+        } catch (IOException ex)
+        {
+            System.out.print("TCPGameServer: Error saving game" + ex + " ");
+        }
+    }
+
+    public void deleteFile()
+    {
+        if (file.delete())
+        {
+            System.out.println("TCPGameServer: File deleted");
+        } else
+        {
+            System.err.println("TCPGameServer: Error deleting file");
+        }
     }
 
     @Override

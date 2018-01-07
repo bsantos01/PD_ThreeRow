@@ -6,8 +6,6 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import logic.GameModel;
-import ui.gui.PopupView;
-import ui.gui.ThreeInRowView;
 
 public final class GameClientConnector implements Runnable
 {
@@ -42,7 +40,7 @@ public final class GameClientConnector implements Runnable
 
         } catch (IOException ex)
         {
-            System.out.println("GameClient: Error creating streams.");
+            System.out.println("GameClientConnector: Error creating streams.");
 
         }
     }
@@ -60,19 +58,19 @@ public final class GameClientConnector implements Runnable
                 {
                     player = "B";
                 }
-                System.out.println("GameClient: String to play recieved! I'm player " + player);
+                System.out.println("GameClientConnector: String to play recieved! I'm player " + player);
                 updateCentralServer("Ok");
-                System.out.println("GameClient: String OK sent!");
+                System.out.println("GameClientConnector: String OK sent!");
 
             } else
             {
                 if (obj.equals("GAMEOVER"))
                 {
-                    System.out.println("GameClient: GAMEOVER arrived...");
+                    System.out.println("GameClientConnector: GAMEOVER arrived...");
                     shutdown();
                 } else
                 {
-                    System.out.println("GameClient: An unexpected string arrived..." + obj + "");
+                    System.out.println("GameClientConnector: An unexpected string arrived..." + obj + "");
                 }
             }
         } else
@@ -83,15 +81,15 @@ public final class GameClientConnector implements Runnable
                 {
                     game = new Game(player);
                     game.updateGame((GameModel) obj);
-                    System.out.println("GameClient: New Game created...");
+                    System.out.println("GameClientConnector: New Game created...");
                 } else
                 {
                     game.updateGame((GameModel) obj);
-                    System.out.println("GameClient: Game updated with object " + obj);
+                    System.out.println("GameClientConnector: Game updated with object " + obj);
                 }
             } else
             {
-                System.out.print("GameClient: I don't really know what this is... " + obj.toString() + " ");
+                System.out.print("GameClientConnector: I don't really know what this is... " + obj.toString() + " ");
             }
         }
 
@@ -122,10 +120,10 @@ public final class GameClientConnector implements Runnable
 
         } catch (IOException ex)
         {
-            System.out.print("GameClient: Shutdown error " + ex + "");
+            System.out.print("GameClientConnector: Shutdown error " + ex + "");
         } catch (InterruptedException ex)
         {
-            System.out.print("GameClient: interrupted Shutdown error " + ex + "");
+            System.out.print("GameClientConnector: interrupted Shutdown error " + ex + "");
         }
     }
 
@@ -135,11 +133,11 @@ public final class GameClientConnector implements Runnable
         {
             out.writeObject(obj);
             out.flush();
-           // System.err.println("GameClient: updateCentralServer sent " + obj);
+           // System.err.println("GameClientConnector: updateCentralServer sent " + obj);
 
         } catch (IOException ex)
         {
-            System.err.println("GameClient: updateGame IOException: " + ex + "");
+            System.err.println("GameClientConnector: updateGame IOException: " + ex + "");
         }
     }
 
@@ -174,18 +172,18 @@ public final class GameClientConnector implements Runnable
                 try
                 {
                     socket = clientServer.accept();
-                    System.out.println("GameClient: GameServer accepted");
+                    System.out.println("GameClientConnector: GameServer accepted");
                     startStreams();
 
                 } catch (IOException ex)
                 {
-                    System.out.println("GameClient: Error starting socket." + ex + " ");
+                    System.out.println("GameClientConnector: Error starting socket." + ex + " ");
                 }
                 while (!stop)
                 {
                     Object obj = in.readObject();
                     objectUpdate(obj);
-                    System.out.println("GameClient: objectUpdate(obj)");
+                    System.out.println("GameClientConnector: objectUpdate(obj)");
 
                     //and here!
                     if (game != null)
@@ -219,13 +217,13 @@ public final class GameClientConnector implements Runnable
             }
         } catch (IOException e)
         {
-            System.err.println("GameClient: run() IOException: " + e + "");
+            System.err.println("GameClientConnector: run() IOException: " + e + "");
         } catch (ClassNotFoundException ex)
         {
-            System.err.println("GameClient: ClassNotFoundException: " + ex + "");
+            System.err.println("GameClientConnector: ClassNotFoundException: " + ex + "");
         } catch (InterruptedException ex)
         {
-            System.err.println("GameClient: InterruptedException: " + ex + "");
+            System.err.println("GameClientConnector: InterruptedException: " + ex + "");
         }
     }
 }
