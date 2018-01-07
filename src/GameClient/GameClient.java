@@ -1,6 +1,5 @@
 package GameClient;
 
-import java.awt.PopupMenu;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -10,6 +9,7 @@ import java.util.Observable;
 import java.util.Observer;
 import logic.GameModel;
 import logic.ObservableGame;
+import ui.gui.PopupView;
 import ui.gui.ThreeInRowView;
 
 public final class GameClient implements Observer, Runnable
@@ -26,7 +26,7 @@ public final class GameClient implements Observer, Runnable
     ObjectOutputStream out;
 
     String player = null;
-    private boolean running = false;
+    private boolean stop = false;
 
     public GameClient(String servicePort) throws IOException
     {
@@ -72,7 +72,6 @@ public final class GameClient implements Observer, Runnable
                     System.out.println("GameClient: GAMEOVER arrived...");
                     //warn the client?!?
                     shutdown();
-
                 } else
                 {
                     System.out.println("GameClient: An unexpected string arrived..." + obj + "");
@@ -124,10 +123,13 @@ public final class GameClient implements Observer, Runnable
             {
                 clientServer.close();
             }
-            running = true;
+            stop = true;
+            PopupView pop = new PopupView();
             Thread.sleep(2000);
             gui.close();
+            pop.close();
             Thread.currentThread().interrupt();
+
         } catch (IOException ex)
         {
             System.out.print("GameClient: Shutdown error " + ex + "");
@@ -166,7 +168,7 @@ public final class GameClient implements Observer, Runnable
                 {
                     System.out.println("GameClient: Error starting socket." + ex + " ");
                 }
-                while (!running)
+                while (!stop)
                 {
                     Object obj = in.readObject();
                     objectUpdate(obj);
@@ -184,21 +186,6 @@ public final class GameClient implements Observer, Runnable
         {
             System.err.println("GameClient: InterruptedException: " + ex + "");
         }
-//        finally
-//        {
-//            try
-//            {
-//                out.writeObject("CLOSED");
-//                out.flush();
-//
-//                System.out.println("GameClient: Socket closed at: " + new Date(System.currentTimeMillis()));
-//                shutdown();
-//
-//            } catch (IOException e)
-//            {
-//                System.out.println("GameClient: Error on finally " + e + "");
-//            }
-//        }
     }
 
     @Override

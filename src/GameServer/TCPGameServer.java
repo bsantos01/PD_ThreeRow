@@ -105,6 +105,10 @@ public class TCPGameServer implements Runnable
         } catch (IOException ex)
         {
             System.err.println("TCPGameServer: updateGame IOException: " + ex + " obj: " + obj);
+            //Note to self:
+            //So yeah, if the client kills the socket, there is no way of knowing it unless you try to write to it.
+            //So our approach shoul be wrapp around it and make shure it does not blow anything...
+            //isClosed() and the others work if TCPGameServer kill the server, but not from the other end.
         }
         System.out.println("TCPGameServer: updateGame sent! ");
 
@@ -122,13 +126,13 @@ public class TCPGameServer implements Runnable
         {
             if (cOneOut != null)
             {
+                System.out.print("cOneOut, GAMEOVER ");
                 updatePlayers(cOneOut, "GAMEOVER");
-                System.out.print("cOneOut, GAMEOVER");
             }
             if (cTwoOut != null)
             {
+                System.out.print("cTwoOut, GAMEOVER ");
                 updatePlayers(cTwoOut, "GAMEOVER");
-                System.out.print("cTwoOut, GAMEOVER");
             }
             //shutdownGame(cOneOut, cTwoOut);
             Thread.sleep(1000);
@@ -139,21 +143,15 @@ public class TCPGameServer implements Runnable
             cTwoOut.close();
             stop = true;
             Thread.sleep(1000);
-            if (cOne != null)
-            {
-                cOne.close();
-            }
-            if (cTwo != null)
-            {
-                cTwo.close();
-            }
+            cOne.close();
+            cTwo.close();
             Thread.currentThread().interrupt();
         } catch (IOException ex)
         {
-            System.out.print("TCPGameServer: Shutdown error " + ex + "");
+            System.out.print("TCPGameServer: Shutdown error " + ex + " ");
         } catch (InterruptedException ex)
         {
-            System.out.print("TCPGameServer: interrupted Shutdown error " + ex + "");
+            System.out.print("TCPGameServer: interrupted Shutdown error " + ex + " ");
         }
 
     }
@@ -228,9 +226,9 @@ public class TCPGameServer implements Runnable
         {
             //Sockets closed abruptly
             shutdownStreams();
+            //write to mySQL server
 
             System.err.println("To the database and beyond!!!");
-
             System.err.println("TCPGameServer: IOException: " + e);
         } catch (ClassNotFoundException ex)
         {
