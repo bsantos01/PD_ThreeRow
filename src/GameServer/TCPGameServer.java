@@ -142,8 +142,8 @@ public class TCPGameServer implements Runnable
             cTwoOut.close();
             stop = true;
 
-            Thread.sleep(1000);
             deleteFile();
+            Thread.sleep(1000);
 
             cOne.close();
             cTwo.close();
