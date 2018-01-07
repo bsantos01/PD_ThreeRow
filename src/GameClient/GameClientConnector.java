@@ -169,11 +169,9 @@ public final class GameClientConnector implements Runnable
 
                         while (game.getGame().getCurrentPlayerName().equals(player) && !game.getGame().isOver())
                         {
-
-                            //Thread.sleep(500);
+                            Thread.sleep(10);
                             //do nothing
                             //sleep
-                            System.err.print('.');
                         }
 
                         if (!lock || player.equals("A"))

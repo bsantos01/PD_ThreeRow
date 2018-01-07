@@ -252,6 +252,7 @@ public class TCPGameServer implements Runnable
         } catch (IOException e)
         {
             //Sockets closed abruptly
+            deleteFile();
             shutdownStreams();
             //write to mySQL server
 
