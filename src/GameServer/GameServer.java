@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import logic.ObservableGame;
 
 public class GameServer
 {
@@ -39,7 +40,7 @@ public class GameServer
         {
             println("GameServer Running");
             startTCPGameServer();
-            heartbeatClient();
+//            heartbeatClient();
             tcpManagerThread.join();
 
         } catch (IOException e)
@@ -74,9 +75,9 @@ public class GameServer
 
     private void stopTCPManager()
     {
-        println("GameServer: Stopping TCP Manager . . . ");
+        println("Stopping TCP Manager . . . ");
         tcpManagerThread.interrupt();
-        println("GameServer: Stopped");
+        println("Stopped");
     }
 
     public void stop() throws IllegalStateException

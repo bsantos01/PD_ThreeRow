@@ -9,10 +9,9 @@ import java.util.Observable;
 import java.util.Observer;
 import logic.GameModel;
 import logic.ObservableGame;
-import ui.gui.PopupView;
 import ui.gui.ThreeInRowView;
 
-public final class GameClientDELETE implements Observer, Runnable
+public final class GameClient implements Observer, Runnable
 {
 
     ObservableGame game;
@@ -26,9 +25,9 @@ public final class GameClientDELETE implements Observer, Runnable
     ObjectOutputStream out;
 
     String player = null;
-    private boolean stop = false;
+    private boolean running = false;
 
-    public GameClientDELETE(String servicePort) throws IOException
+    public GameClient(String servicePort) throws IOException
     {
         this.servicePort = Integer.parseInt(servicePort);
         clientServer = new ServerSocket(this.servicePort);
@@ -70,8 +69,8 @@ public final class GameClientDELETE implements Observer, Runnable
                 if (obj.equals("GAMEOVER"))
                 {
                     System.out.println("GameClient: GAMEOVER arrived...");
-                    //warn the client?!?
                     shutdown();
+
                 } else
                 {
                     System.out.println("GameClient: An unexpected string arrived..." + obj + "");
@@ -86,7 +85,7 @@ public final class GameClientDELETE implements Observer, Runnable
                     System.out.print("GameClient: Yesh, i was null... but no longer!");
                     game = new ObservableGame();
                     game.setGameModel(((GameModel) obj));
-                    game.addObserver(GameClientDELETE.this);
+                    game.addObserver(GameClient.this);
 
                     System.out.print("GameClient: GameModel arrived! ");
                     gui = new ThreeInRowView(game, player);
@@ -111,7 +110,6 @@ public final class GameClientDELETE implements Observer, Runnable
     {
         try
         {
-            //how to show client?
             updateGame("CLOSING");
             out.close();
             in.close();
@@ -123,13 +121,10 @@ public final class GameClientDELETE implements Observer, Runnable
             {
                 clientServer.close();
             }
-            stop = true;
-            PopupView pop = new PopupView();
+            running = true;
             Thread.sleep(2000);
             gui.close();
-            pop.close();
             Thread.currentThread().interrupt();
-
         } catch (IOException ex)
         {
             System.out.print("GameClient: Shutdown error " + ex + "");
@@ -166,9 +161,10 @@ public final class GameClientDELETE implements Observer, Runnable
 
                 } catch (IOException ex)
                 {
-                    System.out.println("GameClient: Error starting socket." + ex + " ");
+                    System.out.println("GameClient: Error starting socket.");
                 }
-                while (!stop)
+
+                while (!running)
                 {
                     Object obj = in.readObject();
                     objectUpdate(obj);
@@ -186,12 +182,26 @@ public final class GameClientDELETE implements Observer, Runnable
         {
             System.err.println("GameClient: InterruptedException: " + ex + "");
         }
+//        finally
+//        {
+//            try
+//            {
+//                out.writeObject("CLOSED");
+//                out.flush();
+//
+//                System.out.println("GameClient: Socket closed at: " + new Date(System.currentTimeMillis()));
+//                shutdown();
+//
+//            } catch (IOException e)
+//            {
+//                System.out.println("GameClient: Error on finally " + e + "");
+//            }
+//        }
     }
 
     @Override
     public void update(Observable o, Object arg)
     {
-
         if (!game.getCurrentPlayerName().equals(player))
         {
             updateGame(game.getGameModel());
@@ -205,6 +215,6 @@ public final class GameClientDELETE implements Observer, Runnable
             updateGame(game.getGameModel());
 
         }
-
     }
+
 }
