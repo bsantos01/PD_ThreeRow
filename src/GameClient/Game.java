@@ -81,17 +81,12 @@ public class Game implements Observer
     }
 
     @Override
-    public synchronized void update(Observable o, Object arg)
+    public void update(Observable o, Object arg)
     {
-//        turn = game.getCurrentPlayerName().equals(player);
         System.out.println("Game: sync update");
         if (!game.getCurrentPlayerName().equals(player))
         {
-//            if (game.isOver())
-//            {
-//                turn = false;
-//                System.err.println("I have won! ");
-//            }
+
             turn = false;
             if (gui != null)
             {
@@ -105,11 +100,6 @@ public class Game implements Observer
             }
             turn = true;
         }
-//        if (game.isOver())
-//        {
-//            turn = false;
-//            System.err.println("I have won! ");
-//        }
         System.out.println("Game: update! it's my turn? - " + turn);
 
     }

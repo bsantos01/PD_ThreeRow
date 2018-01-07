@@ -11,7 +11,6 @@ public final class GameClientConnector implements Runnable
 {
 
     Game game;
-    //ThreeInRowView gui;
 
     ServerSocket clientServer;
     Socket socket;
@@ -133,7 +132,7 @@ public final class GameClientConnector implements Runnable
         {
             out.writeObject(obj);
             out.flush();
-           // System.err.println("GameClientConnector: updateCentralServer sent " + obj);
+            // System.err.println("GameClientConnector: updateCentralServer sent " + obj);
 
         } catch (IOException ex)
         {
@@ -141,27 +140,6 @@ public final class GameClientConnector implements Runnable
         }
     }
 
-//    //here!
-//    public void update()
-//    {
-//
-//        if (!game.getGame().getCurrentPlayerName().equals(player))
-//        {
-//            System.err.println("FIRST IF");
-//            updateCentralServer(game.getGame());
-//            gui.enableGrid(false);
-//        } else
-//        {
-//            System.err.println("FISRT ELSE");
-//            gui.enableGrid(true);
-//        }
-//        if (game.getGame().hasWon(game.getGame().getCurrentPlayer()))
-//        {
-//            System.err.println("WON IF");
-//            updateCentralServer(game.getGame());
-//        }
-//
-//    }
     @Override
     public void run()
     {
@@ -192,6 +170,7 @@ public final class GameClientConnector implements Runnable
                         while (game.getGame().getCurrentPlayerName().equals(player) && !game.getGame().isOver())
                         {
 
+                            //Thread.sleep(500);
                             //do nothing
                             //sleep
                             System.err.print('.');

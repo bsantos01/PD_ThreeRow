@@ -7,9 +7,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import logic.GameModel;
 
 public class TCPGameServer implements Runnable
@@ -88,8 +85,7 @@ public class TCPGameServer implements Runnable
                     System.err.println("TCPGameServer: An unexpected string arrived..." + obj + " ");
                 }
             }
-            // end conditions?
-            //socket disconnected conditions?
+
         } else
         {
             if (obj instanceof GameModel)
@@ -122,11 +118,6 @@ public class TCPGameServer implements Runnable
 
     }
 
-//    public void shutdownGame(ObjectOutputStream one, ObjectOutputStream two)
-//    {
-//        updatePlayers(one, "GAMEOVER");
-//        updatePlayers(two, "GAMEOVER");
-//    }
     public void shutdownStreams()
     {
 
