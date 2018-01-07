@@ -5,18 +5,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Observable;
-import java.util.Observer;
 import logic.GameModel;
-import logic.ObservableGame;
 import ui.gui.PopupView;
 import ui.gui.ThreeInRowView;
 
-public final class GameClient implements Observer, Runnable
+public final class GameClientConnector implements Runnable
 {
 
-    ObservableGame game;
-    ThreeInRowView gui;
+    Game game;
+    //ThreeInRowView gui;
 
     ServerSocket clientServer;
     Socket socket;
@@ -27,8 +24,9 @@ public final class GameClient implements Observer, Runnable
 
     String player = null;
     private boolean stop = false;
+    private boolean lock = true;
 
-    public GameClient(String servicePort) throws IOException
+    public GameClientConnector(String servicePort) throws IOException
     {
         this.servicePort = Integer.parseInt(servicePort);
         clientServer = new ServerSocket(this.servicePort);
@@ -63,14 +61,14 @@ public final class GameClient implements Observer, Runnable
                     player = "B";
                 }
                 System.out.println("GameClient: String to play recieved! I'm player " + player);
-                updateGame("Ok");
+                updateCentralServer("Ok");
                 System.out.println("GameClient: String OK sent!");
+
             } else
             {
                 if (obj.equals("GAMEOVER"))
                 {
                     System.out.println("GameClient: GAMEOVER arrived...");
-                    //warn the client?!?
                     shutdown();
                 } else
                 {
@@ -83,21 +81,13 @@ public final class GameClient implements Observer, Runnable
             {
                 if (game == null)
                 {
-                    System.out.print("GameClient: Yesh, i was null... but no longer!");
-                    game = new ObservableGame();
-                    game.setGameModel(((GameModel) obj));
-                    game.addObserver(GameClient.this);
-
-                    System.out.print("GameClient: GameModel arrived! ");
-                    gui = new ThreeInRowView(game, player);
-                    if (!game.getCurrentPlayerName().equals(player))
-                    {
-                        gui.enableGrid(false);
-                    }
+                    game = new Game(player);
+                    game.updateGame((GameModel) obj);
+                    System.out.println("GameClient: New Game created...");
                 } else
                 {
-                    System.out.print("GameClient: Recieved a GameModel. " + game.getCurrentPlayerName() + " ");
-                    game.setGameModel(((GameModel) obj));
+                    game.updateGame((GameModel) obj);
+                    System.out.println("GameClient: Game updated with object " + obj);
                 }
             } else
             {
@@ -111,8 +101,7 @@ public final class GameClient implements Observer, Runnable
     {
         try
         {
-            //how to show client?
-            updateGame("CLOSING");
+            updateCentralServer("CLOSING");
             out.close();
             in.close();
             if (socket != null)
@@ -124,10 +113,11 @@ public final class GameClient implements Observer, Runnable
                 clientServer.close();
             }
             stop = true;
-            PopupView pop = new PopupView();
             Thread.sleep(2000);
-            gui.close();
-            pop.close();
+            game.closeGui();
+            Thread.sleep(2000);
+            game.closePop();
+
             Thread.currentThread().interrupt();
 
         } catch (IOException ex)
@@ -139,18 +129,41 @@ public final class GameClient implements Observer, Runnable
         }
     }
 
-    public void updateGame(Object obj)
+    public void updateCentralServer(Object obj)
     {
         try
         {
             out.writeObject(obj);
             out.flush();
+           // System.err.println("GameClient: updateCentralServer sent " + obj);
+
         } catch (IOException ex)
         {
             System.err.println("GameClient: updateGame IOException: " + ex + "");
         }
     }
 
+//    //here!
+//    public void update()
+//    {
+//
+//        if (!game.getGame().getCurrentPlayerName().equals(player))
+//        {
+//            System.err.println("FIRST IF");
+//            updateCentralServer(game.getGame());
+//            gui.enableGrid(false);
+//        } else
+//        {
+//            System.err.println("FISRT ELSE");
+//            gui.enableGrid(true);
+//        }
+//        if (game.getGame().hasWon(game.getGame().getCurrentPlayer()))
+//        {
+//            System.err.println("WON IF");
+//            updateCentralServer(game.getGame());
+//        }
+//
+//    }
     @Override
     public void run()
     {
@@ -174,6 +187,34 @@ public final class GameClient implements Observer, Runnable
                     objectUpdate(obj);
                     System.out.println("GameClient: objectUpdate(obj)");
 
+                    //and here!
+                    if (game != null)
+                    {
+
+                        while (game.getGame().getCurrentPlayerName().equals(player) && !game.getGame().isOver())
+                        {
+
+                            //do nothing
+                            //sleep
+                            System.err.print('.');
+                        }
+
+                        if (!lock || player.equals("A"))
+                        {
+                            updateCentralServer(game.getGame());
+                            System.out.println("After do nothing... updta central");
+                        } else
+                        {
+                            if (player.equals("B")) //carefull here - FUTURE!
+                            {
+                                lock = false;
+                                System.err.println("GameClientConnector: Player 2 unlocked");
+                            }
+                        }
+                        System.out.println("After do nothing...");
+
+                    }
+                    //
                 }
             }
         } catch (IOException e)
@@ -186,25 +227,5 @@ public final class GameClient implements Observer, Runnable
         {
             System.err.println("GameClient: InterruptedException: " + ex + "");
         }
-    }
-
-    @Override
-    public void update(Observable o, Object arg)
-    {
-
-        if (!game.getCurrentPlayerName().equals(player))
-        {
-            updateGame(game.getGameModel());
-            gui.enableGrid(false);
-        } else
-        {
-            gui.enableGrid(true);
-        }
-        if (game.hasWon(game.getCurrentPlayer()))
-        {
-            updateGame(game.getGameModel());
-
-        }
-
     }
 }

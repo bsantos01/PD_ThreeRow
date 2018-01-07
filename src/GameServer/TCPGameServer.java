@@ -1,14 +1,10 @@
 package GameServer;
 
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import logic.GameModel;
 
 public class TCPGameServer implements Runnable
@@ -76,6 +72,8 @@ public class TCPGameServer implements Runnable
                 if (((String) obj).equalsIgnoreCase("CLOSING"))
                 {
                     shutdownStreams();
+                    System.out.println("TCPGameServer: CLOSING clients recieved! ");
+
                 } else
                 {
                     System.err.println("TCPGameServer: An unexpected string arrived..." + obj + " ");
@@ -180,10 +178,11 @@ public class TCPGameServer implements Runnable
                             {
                                 updatePlayers(cTwoOut, game.getGame());
                                 shutdownStreams();
+                            } else
+                            {
+                                objectUpdate(obj);
+                                updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
                             }
-                            objectUpdate(obj);
-                            updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
-
                         }
                         playerOne = false;
 
