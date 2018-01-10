@@ -9,8 +9,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import logic.GameModel;
 
-public class TCPGameServer implements Runnable
-{
+public class TCPGameServer implements Runnable {
 
     //TCP
     private Socket cOne = null;
@@ -29,17 +28,14 @@ public class TCPGameServer implements Runnable
     boolean playerOne = true;
     private boolean stop = false;
 
-    public TCPGameServer(InetAddress cOneAdress, int cOneport, InetAddress cTwoAdress, int cTwoport)
-    {
-        try
-        {
+    public TCPGameServer(InetAddress cOneAdress, int cOneport, InetAddress cTwoAdress, int cTwoport) {
+        try {
             cOne = new Socket(cOneAdress, cOneport);
             System.out.println("Adress: " + cOneAdress + " and Port: " + cOneport);
             cTwo = new Socket(cTwoAdress, cTwoport);
             System.out.println("Adress: " + cTwoAdress + " and Port: " + cTwoport);
 
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             System.err.println("TCPGameServer: Error creating sockets. INSURE CLIENTS ARE RUNNING!");
         }
         long num = System.currentTimeMillis();
@@ -47,10 +43,8 @@ public class TCPGameServer implements Runnable
     }
 
 //    stream start for both clients
-    public void startStreams() throws IOException
-    {
-        try
-        {
+    public void startStreams() throws IOException {
+        try {
             cOneOut = new ObjectOutputStream(cOne.getOutputStream());
             cOneIn = new ObjectInputStream(cOne.getInputStream());
 
@@ -59,55 +53,39 @@ public class TCPGameServer implements Runnable
 
             System.out.println("TCPGameServer: Streams are up! ");
 
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             System.out.println("TCPGameServer: Error creating streams.");
         }
     }
 
-    public void objectUpdate(Object obj)
-    {
-        if (obj instanceof String)
-        {
-            if (((String) obj).equalsIgnoreCase("Ok"))
-            {
+    public void objectUpdate(Object obj) {
+        if (obj instanceof String) {
+            if (((String) obj).equalsIgnoreCase("Ok")) {
                 game = new Game();
                 System.out.println("TCPGameServer: Both players ready! ");
-            } else
-            {
-                if (((String) obj).equalsIgnoreCase("CLOSING"))
-                {
-                    shutdownStreams();
-                    System.out.println("TCPGameServer: CLOSING clients recieved! ");
+            } else if (((String) obj).equalsIgnoreCase("CLOSING")) {
+                shutdownStreams();
+                System.out.println("TCPGameServer: CLOSING clients recieved! ");
 
-                } else
-                {
-                    System.err.println("TCPGameServer: An unexpected string arrived..." + obj + " ");
-                }
+            } else {
+                System.err.println("TCPGameServer: An unexpected string arrived..." + obj + " ");
             }
 
-        } else
-        {
-            if (obj instanceof GameModel)
-            {
-                System.out.print("TCPGameServer: Recieved a GameModel.");
-                game.setGame((GameModel) obj);
-                saveFile();
-            } else
-            {
-                System.err.print("TCPGameServer: I don't really know what this is..." + obj.toString() + " ");
-            }
+        } else if (obj instanceof GameModel) {
+            System.out.print("TCPGameServer: Recieved a GameModel.");
+            game.setGame((GameModel) obj);
+            saveFile();
+        } else {
+            System.err.print("TCPGameServer: I don't really know what this is..." + obj.toString() + " ");
         }
+
     }
 
-    public void updatePlayers(ObjectOutputStream out, Object obj)
-    {
-        try
-        {
+    public void updatePlayers(ObjectOutputStream out, Object obj) {
+        try {
             out.writeObject(obj);
             out.flush();
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             System.err.println("TCPGameServer: updateGame IOException: " + ex + " obj: " + obj);
             //Note to self:
             //So yeah, if the client kills the socket, there is no way of knowing it unless you try to write to it.
@@ -118,18 +96,14 @@ public class TCPGameServer implements Runnable
 
     }
 
-    public void shutdownStreams()
-    {
+    public void shutdownStreams() {
 
-        try
-        {
-            if (cOneOut != null)
-            {
+        try {
+            if (cOneOut != null) {
                 System.out.print("cOneOut, GAMEOVER ");
                 updatePlayers(cOneOut, "GAMEOVER");
             }
-            if (cTwoOut != null)
-            {
+            if (cTwoOut != null) {
                 System.out.print("cTwoOut, GAMEOVER ");
                 updatePlayers(cTwoOut, "GAMEOVER");
             }
@@ -148,109 +122,83 @@ public class TCPGameServer implements Runnable
             cOne.close();
             cTwo.close();
             Thread.currentThread().interrupt();
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             System.out.print("TCPGameServer: Shutdown error " + ex + " ");
-        } catch (InterruptedException ex)
-        {
+        } catch (InterruptedException ex) {
             System.out.print("TCPGameServer: interrupted Shutdown error " + ex + " ");
         }
 
     }
 
-    public void saveFile()
-    {
-        try
-        {
+    public void saveFile() {
+        try {
             file = new File(fileName);
             FileUtility.saveGameToFile(file, game.getGame());
             System.out.println("TCPGameServer: Game saved as file!");
-        } catch (IOException ex)
-        {
+        } catch (IOException ex) {
             System.out.print("TCPGameServer: Error saving game" + ex + " ");
         }
     }
 
-    public void deleteFile()
-    {
-        if (file.delete())
-        {
+    public void deleteFile() {
+        if (file.delete()) {
             System.out.println("TCPGameServer: File deleted");
-        } else
-        {
+        } else {
             System.err.println("TCPGameServer: Error deleting file");
         }
     }
 
     @Override
-    public void run()
-    {
-        try
-        {
+    public void run() {
+        try {
             //start streams here?
-            while (!Thread.currentThread().isInterrupted())
-            {
+            while (!Thread.currentThread().isInterrupted()) {
                 startStreams();
                 updatePlayers(cOneOut, "Player1");
                 updatePlayers(cTwoOut, "Player2");
 
                 while (!stop) // insert condition to end while
                 {
-                    if (playerOne)
-                    {
+                    if (playerOne) {
                         Object obj = cOneIn.readObject();
 
-                        if (game != null)
-                        {
-                            if (game.getGame().isOver())
-                            {
+                        if (game != null) {
+                            if (game.getGame().isOver()) {
                                 updatePlayers(cTwoOut, game.getGame());
                                 shutdownStreams();
-                            } else
-                            {
+                            } else {
                                 objectUpdate(obj);
                                 updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
                             }
                         }
                         playerOne = false;
 
-                    } else
-                    {
-                        if (!playerOne)
-                        {
-                            Object obj = cTwoIn.readObject();
-                            if (game == null)
-                            {
-                                objectUpdate(obj);
-                                updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
-                                updatePlayers(cOneOut, game.getGame()); //sends new gameModel to player one
-                                playerOne = true;
+                    } else if (!playerOne) {
+                        Object obj = cTwoIn.readObject();
+                        if (game == null) {
+                            objectUpdate(obj);
+                            updatePlayers(cTwoOut, game.getGame()); //sends new gameModel to player two
+                            updatePlayers(cOneOut, game.getGame()); //sends new gameModel to player one
+                            playerOne = true;
 
-                            } else
-                            {
-                                if (game.getGame().isOver())
-                                {
-                                    updatePlayers(cOneOut, game.getGame());
-                                    shutdownStreams();
+                        } else if (game.getGame().isOver()) {
+                            updatePlayers(cOneOut, game.getGame());
+                            shutdownStreams();
 
-                                } else
-                                {
-                                    objectUpdate(obj);
-                                    updatePlayers(cOneOut, game.getGame()); //sends new gameModel to player one
-                                    playerOne = true;
+                        } else {
+                            objectUpdate(obj);
+                            updatePlayers(cOneOut, game.getGame()); //sends new gameModel to player one
+                            playerOne = true;
 
-                                }
-                            }
-
-                        } else
-                        {
-                            System.out.println("TCPGameServer: Rejected content!");
                         }
+
+                    } else {
+                        System.out.println("TCPGameServer: Rejected content!");
                     }
+
                 }
             }
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             //Sockets closed abruptly
             deleteFile();
             shutdownStreams();
@@ -258,8 +206,7 @@ public class TCPGameServer implements Runnable
 
             System.err.println("To the database and beyond!!!");
             System.err.println("TCPGameServer: IOException: " + e);
-        } catch (ClassNotFoundException ex)
-        {
+        } catch (ClassNotFoundException ex) {
             System.err.println("TCPGameServer: ClassNotFoundException: " + ex);
         }
 

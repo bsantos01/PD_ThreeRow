@@ -2,10 +2,8 @@ package GameServer;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
-public class UDPClient 
-{
+public class UDPClient {
 
     public static final int BUFSIZE = 3500;
 
@@ -18,24 +16,18 @@ public class UDPClient
     ObjectOutputStream out;
     ByteArrayOutputStream bOut;
 
-    public UDPClient(String clientName, int port)
-    {
+    public UDPClient(String clientName, int port) {
         this.clientName = clientName;
-        this.port=port;
-        try
-        {
+        this.port = port;
+        try {
             addr = InetAddress.getByName("127.0.0.1");
-        } catch (UnknownHostException ex)
-        {
+        } catch (UnknownHostException ex) {
             System.err.println("UDP UnknownHostException");
         }
     }
 
-    public void start()
-    {
-
-        try
-        {
+    public void start() {
+        try {
 
             socket = new DatagramSocket();
             socket.setSoTimeout(2 * 1000);
@@ -58,16 +50,13 @@ public class UDPClient
             DatagramPacket receivePacket = new DatagramPacket(buffer, BUFSIZE);
             boolean timeout = false;
 
-            try
-            {
+            try {
                 socket.receive(receivePacket);
-            } catch (InterruptedIOException e)
-            {
+            } catch (InterruptedIOException e) {
                 System.out.println("UDP Timeout error " + e);
                 timeout = true;
             }
-            if (!timeout)
-            {
+            if (!timeout) {
                 System.out.println("UDP Packet received!");
                 System.out.println("Details : " + receivePacket.getAddress());
 
@@ -75,23 +64,18 @@ public class UDPClient
                 String msgs = (String) in.readObject();
 
                 System.out.println(msgs);
-            } else
-            {
+            } else {
                 System.out.println("Nothing recieved... UDP Packet lost!");
             }
 
-            try
-            {
+            try {
                 Thread.sleep(1000);
-            } catch (InterruptedException e)
-            {
+            } catch (InterruptedException e) {
                 System.out.println("UDP Interrupted thread " + e);
             }
-        } catch (IOException e)
-        {
+        } catch (IOException e) {
             System.out.println("UDP IoException error " + e);
-        } catch (ClassNotFoundException ex)
-        {
+        } catch (ClassNotFoundException ex) {
             System.out.println("UDP Class not found error " + ex);
         }
 
