@@ -2,11 +2,9 @@ package GameClient;
 
 import java.io.IOException;
 
-public class MainTwo
-{
+public class MainTwo {
 
-    public static void main(String[] args) throws IllegalStateException, IOException, InterruptedException
-    {
+    public static void main(String[] args) throws IllegalStateException, IOException, InterruptedException {
 //
 //        GameClientDELETE c1 = new GameClientDELETE("8888");
 //        Thread cl1 = new Thread(c1);
@@ -19,5 +17,6 @@ public class MainTwo
         cl1.setDaemon(true);
         cl1.start();
         cl1.join();
+
     }
 }
