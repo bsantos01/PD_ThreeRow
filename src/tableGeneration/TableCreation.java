@@ -1,6 +1,7 @@
 package tableGeneration;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -50,17 +51,25 @@ public class TableCreation {
 
         connect();
 
-        myStmt.executeUpdate("CREATE TABLE client (\n"
-                + "  username varchar(45) NOT NULL,\n"
-                + "  pass varchar(45) DEFAULT NULL,\n"
-                + "  active tinyint(4) DEFAULT NULL,\n"
-                + "  ip varchar(20) DEFAULT NULL,\n"
-                + "  port varchar(20) DEFAULT NULL,\n"
-                + "  ingame tinyint(4) DEFAULT NULL,\n"
-                + "  free tinyint(4) DEFAULT NULL,\n"
-                + "  PRIMARY KEY (username)\n"
-                + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DatabaseMetaData dbm = myConn.getMetaData();
+        ResultSet res = dbm.getTables(null, null, "CLIENT", null);
+        if (!res.next()) {
 
+            myStmt.executeUpdate("CREATE TABLE client (\n"
+                    + "  username varchar(45) NOT NULL,\n"
+                    + "  pass varchar(45) DEFAULT NULL,\n"
+                    + "  active tinyint(4) DEFAULT NULL,\n"
+                    + "  ip varchar(20) DEFAULT NULL,\n"
+                    + "  port varchar(20) DEFAULT NULL,\n"
+                    + "  ingame tinyint(4) DEFAULT NULL,\n"
+                    + "  free tinyint(4) DEFAULT NULL,\n"
+                    + "  PRIMARY KEY (username)\n"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+
+            System.out.println("TableCreation: Clients generated!");
+        } else {
+            System.out.println("Table CLIENT already exists!");
+        }
         close();
     }
 
@@ -68,14 +77,24 @@ public class TableCreation {
 
         connect();
 
-        myStmt.executeUpdate("CREATE TABLE pairs (\n"
-                + "  id int(11) NOT NULL,\n"
-                + "  user1 varchar(45) DEFAULT NULL,\n"
-                + "  user2 varchar(45) DEFAULT NULL,\n"
-                + "  status varchar(45) DEFAULT NULL,\n"
-                + "  winner varchar(45) DEFAULT NULL,\n"
-                + "  PRIMARY KEY (id)\n"
-                + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DatabaseMetaData dbm = myConn.getMetaData();
+        ResultSet res = dbm.getTables(null, null, "PAIRS", null);
+        if (!res.next()) {
+
+            myStmt.executeUpdate("CREATE TABLE pairs (\n"
+                    + "  id int(11) NOT NULL,\n"
+                    + "  user1 varchar(45) DEFAULT NULL,\n"
+                    + "  user2 varchar(45) DEFAULT NULL,\n"
+                    + "  status varchar(45) DEFAULT NULL,\n"
+                    + "  winner varchar(45) DEFAULT NULL,\n"
+                    + "  PRIMARY KEY (id)\n"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+
+            System.out.println("TableCreation: Pairs generated!");
+
+        } else {
+            System.out.println("Table PAIRS already exists!");
+        }
 
         close();
     }
@@ -84,14 +103,21 @@ public class TableCreation {
 
         connect();
 
-        myStmt.executeUpdate("CREATE TABLE savegame (\n"
-                + "  id int(11) NOT NULL,\n"
-                + "  user1 varchar(45) DEFAULT NULL,\n"
-                + "  user2 varchar(45) DEFAULT NULL,\n"
-                + "  game BLOB,\n"
-                + "  PRIMARY KEY (id)\n"
-                + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+        DatabaseMetaData dbm = myConn.getMetaData();
+        ResultSet res = dbm.getTables(null, null, "SAVEGAME", null);
+        if (!res.next()) {
+            myStmt.executeUpdate("CREATE TABLE savegame (\n"
+                    + "  id int(11) NOT NULL,\n"
+                    + "  user1 varchar(45) DEFAULT NULL,\n"
+                    + "  user2 varchar(45) DEFAULT NULL,\n"
+                    + "  game BLOB,\n"
+                    + "  PRIMARY KEY (id)\n"
+                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+            System.out.println("TableCreation: Savegame generated!");
 
+        } else {
+            System.out.println("Table SAVEGAME already exists!");
+        }
         close();
     }
 

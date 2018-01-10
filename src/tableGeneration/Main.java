@@ -7,6 +7,8 @@ public class Main {
 
     public static void main(String[] args) throws IllegalStateException, IOException, InterruptedException, SQLException {
 
-        // new TableCreation().generateTableSaveGame();
+        new TableCreation().generateTableClient();
+        new TableCreation().generateTablePairs();
+        new TableCreation().generateTableSaveGame();
     }
 }
