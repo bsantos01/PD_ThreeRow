@@ -15,6 +15,10 @@ public class GameServer {
     private final int servicePort;
     private final int servicePort2;
 
+    //getFromDb
+    String user1 = "Bruno";
+    String user2 = "Miguel";
+
     public GameServer(InetAddress serviceAddress, String servicePort, InetAddress serviceAddress2, String servicePort2) {
         this.serviceAddress = serviceAddress;
         this.serviceAddress2 = serviceAddress2;
@@ -25,7 +29,7 @@ public class GameServer {
 
     public void start() throws IllegalStateException, ClassNotFoundException {
         if (hasStarted) {
-            throw new IllegalStateException("Server is running or has already ran.");
+            throw new IllegalStateException("GameServer is running or has already ran.");
         } else {
             hasStarted = true;
         }
@@ -52,7 +56,7 @@ public class GameServer {
     private void startTCPGameServer() throws IOException {
         println("Starting TCPGameServer . . . ");
 
-        tcpGameServer = new TCPGameServer(serviceAddress, servicePort, serviceAddress2, servicePort2);
+        tcpGameServer = new TCPGameServer(user1, serviceAddress, servicePort, user2, serviceAddress2, servicePort2);
         tcpManagerThread = new Thread(tcpGameServer);
         tcpManagerThread.setDaemon(true);
         tcpManagerThread.start();

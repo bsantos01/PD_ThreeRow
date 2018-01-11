@@ -99,28 +99,29 @@ public class TableCreation {
         close();
     }
 
-    public void generateTableSaveGame() throws SQLException {
-
-        connect();
-
-        DatabaseMetaData dbm = myConn.getMetaData();
-        ResultSet res = dbm.getTables(null, null, "SAVEGAME", null);
-        if (!res.next()) {
-            myStmt.executeUpdate("CREATE TABLE savegame (\n"
-                    + "  id int(11) NOT NULL,\n"
-                    + "  user1 varchar(45) DEFAULT NULL,\n"
-                    + "  user2 varchar(45) DEFAULT NULL,\n"
-                    + "  game BLOB,\n"
-                    + "  PRIMARY KEY (id)\n"
-                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-            System.out.println("TableCreation: Savegame generated!");
-
-        } else {
-            System.out.println("Table SAVEGAME already exists!");
-        }
-        close();
-    }
-
+    //not needed
+//    public void generateTableGames() throws SQLException {
+//
+//        connect();
+//
+//        DatabaseMetaData dbm = myConn.getMetaData();
+//        ResultSet res = dbm.getTables(null, null, "GAMES", null);
+//        if (!res.next()) {
+//            myStmt.executeUpdate("CREATE TABLE games (\n"
+//                    + "  id int(11) NOT NULL,\n"
+//                    + "  user1 varchar(45) DEFAULT NULL,\n"
+//                    + "  user2 varchar(45) DEFAULT NULL,\n"
+//                    + "  game BLOB,\n"
+//                    + "  status varchar(45) DEFAULT NULL,\n"
+//                    + "  PRIMARY KEY (id)\n"
+//                    + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
+//            System.out.println("TableCreation: Savegame generated!");
+//
+//        } else {
+//            System.out.println("Table SAVEGAME already exists!");
+//        }
+//        close();
+//    }
     private void close() throws SQLException {
         if (myStmt != null) {
             myStmt.close();

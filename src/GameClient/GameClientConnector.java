@@ -22,7 +22,8 @@ public final class GameClientConnector implements Runnable {
     private boolean stop = false;
     private boolean lock = true;
 
-    public GameClientConnector(String servicePort) throws IOException {
+    public GameClientConnector(String servicePort, String username) throws IOException {
+        this.player = username;
         this.servicePort = Integer.parseInt(servicePort);
         clientServer = new ServerSocket(this.servicePort);
         System.out.println("ServerSocket started @Port " + clientServer.getLocalPort() + " ");
@@ -42,11 +43,7 @@ public final class GameClientConnector implements Runnable {
     public void objectUpdate(Object obj) throws InterruptedException, IOException {
         if (obj instanceof String) {
             if (obj.equals("Player1") || obj.equals("Player2")) {
-                if (obj.equals("Player1")) {
-                    player = "A";
-                } else {
-                    player = "B";
-                }
+
                 System.out.println("GameClientConnector: String to play recieved! I'm player " + player);
                 updateCentralServer("Ok");
                 System.out.println("GameClientConnector: String OK sent!");
@@ -135,10 +132,10 @@ public final class GameClientConnector implements Runnable {
                             //sleep
                         }
 
-                        if (!lock || player.equals("A")) {
+                        if (!lock || player.equals(game.getGame().getPlayer1().getName())) {
                             updateCentralServer(game.getGame());
                             System.out.println("After do nothing... updta central");
-                        } else if (player.equals("B")) //carefull here - FUTURE!
+                        } else if (player.equals(game.getGame().getPlayer2().getName())) //carefull here - FUTURE!
                         {
                             lock = false;
                             System.err.println("GameClientConnector: Player 2 unlocked");

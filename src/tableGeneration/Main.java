@@ -9,6 +9,6 @@ public class Main {
 
         new TableCreation().generateTableClient();
         new TableCreation().generateTablePairs();
-        new TableCreation().generateTableSaveGame();
+//        new TableCreation().generateTableGames();
     }
 }

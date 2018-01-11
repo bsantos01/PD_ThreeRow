@@ -18,6 +18,8 @@ public class TCPGameServer implements Runnable {
 
     String fileName = "";
     File file;
+    String user1;
+    String user2;
 
     ObjectInputStream cOneIn;
     ObjectOutputStream cOneOut;
@@ -28,7 +30,9 @@ public class TCPGameServer implements Runnable {
     boolean playerOne = true;
     private boolean stop = false;
 
-    public TCPGameServer(InetAddress cOneAdress, int cOneport, InetAddress cTwoAdress, int cTwoport) {
+    public TCPGameServer(String user1, InetAddress cOneAdress, int cOneport, String user2, InetAddress cTwoAdress, int cTwoport) {
+        this.user1 = user1;
+        this.user2 = user2;
         try {
             cOne = new Socket(cOneAdress, cOneport);
             System.out.println("Adress: " + cOneAdress + " and Port: " + cOneport);
@@ -39,7 +43,7 @@ public class TCPGameServer implements Runnable {
             System.err.println("TCPGameServer: Error creating sockets. INSURE CLIENTS ARE RUNNING!");
         }
         long num = System.currentTimeMillis();
-        fileName = "savedgame" + num + ".bin";
+        fileName = "savedgame" + user1 + user2 + ".bin";
     }
 
 //    stream start for both clients
@@ -61,7 +65,7 @@ public class TCPGameServer implements Runnable {
     public void objectUpdate(Object obj) {
         if (obj instanceof String) {
             if (((String) obj).equalsIgnoreCase("Ok")) {
-                game = new Game();
+                game = new Game(user1, user2);
                 System.out.println("TCPGameServer: Both players ready! ");
             } else if (((String) obj).equalsIgnoreCase("CLOSING")) {
                 shutdownStreams();
@@ -200,7 +204,7 @@ public class TCPGameServer implements Runnable {
             }
         } catch (IOException e) {
             //Sockets closed abruptly
-            deleteFile();
+            //deleteFile();
             shutdownStreams();
             //write to mySQL server
 

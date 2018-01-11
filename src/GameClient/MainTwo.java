@@ -12,7 +12,7 @@ public class MainTwo {
 //        cl1.start();
 //        cl1.join();
 
-        GameClientConnector c1 = new GameClientConnector("8888");
+        GameClientConnector c1 = new GameClientConnector("8888", "Miguel");
         Thread cl1 = new Thread(c1);
         cl1.setDaemon(true);
         cl1.start();

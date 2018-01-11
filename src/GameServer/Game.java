@@ -9,8 +9,10 @@ public class Game implements Observer {
 
     ObservableGame game;
 
-    public Game() {
+    public Game(String user1, String user2) {
         game = new ObservableGame();
+        game.setPlayerName(1, user1);
+        game.setPlayerName(2, user2);
         game.addObserver(Game.this);
         game.startGame();
     }
