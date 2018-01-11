@@ -1,4 +1,4 @@
-package RmiServer;
+package RmiClient;
 
 import java.io.Serializable;
 
