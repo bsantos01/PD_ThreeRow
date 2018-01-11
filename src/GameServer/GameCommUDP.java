@@ -7,14 +7,14 @@ public class GameCommUDP {
 
     public static final int BUFSIZE = 3500;
 
-    private final String clientName;
-    private final int port;
-    InetAddress addr = null;
-    DatagramSocket socket;
-    DatagramPacket sendPacket;
-    ObjectInputStream in;
-    ObjectOutputStream out;
-    ByteArrayOutputStream bOut;
+    private String clientName;
+    private int port;
+    private InetAddress addr = null;
+    private DatagramSocket socket;
+    private DatagramPacket sendPacket;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
+    private ByteArrayOutputStream bOut;
 
     public GameCommUDP(String clientName, int port) {
         this.clientName = clientName;

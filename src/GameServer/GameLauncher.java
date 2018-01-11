@@ -4,8 +4,6 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GameLauncher {
 
@@ -19,8 +17,9 @@ public class GameLauncher {
 
     //private String ipAndPort = "";
     private GameDBHandler database;
+    private Pair pair;
 
-    //getFromDb
+    //getFromDb, and delete this
     String user1 = "Bruno";
     String user2 = "Miguel";
 
@@ -36,6 +35,7 @@ public class GameLauncher {
         try {
             database = new GameDBHandler(ipAndPort);
 
+            pair = p;
             user1 = p.getUser1();
             user2 = p.getUser2();
 
@@ -71,11 +71,17 @@ public class GameLauncher {
             println("GameServer Running");
             startTCPGameServer();
             heartbeatClient();
+
+            database.setInGame(pair.getId());
+            database.setOcuppied(user1);
+            database.setOcuppied(user2);
+
             tcpManagerThread.join();
 
         } catch (IOException e) {
+            System.err.println("GameLauncher: IOException start()" + e);
         } catch (InterruptedException ex) {
-            Logger.getLogger(GameLauncher.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("GameLauncher: InterruptedException start()" + ex);
         } finally {
             stop();
         }
@@ -87,7 +93,7 @@ public class GameLauncher {
     }
 
     private void startTCPGameServer() throws IOException {
-        println("Starting TCPGameServer . . . ");
+        println("Starting GameCommTCP . . . ");
 
         tcpGameServer = new GameCommTCP(user1, serviceAddress, servicePort, user2, serviceAddress2, servicePort2);
         tcpManagerThread = new Thread(tcpGameServer);
@@ -98,7 +104,12 @@ public class GameLauncher {
     }
 
     private void stopTCPManager() {
-        println("GameServer: Stopping TCP Manager . . . ");
+        println("GameServer: Stopping GameCommTCP");
+
+        database.setInterrupted(pair.getId());
+        database.setOcuppied(user1);
+        database.setOcuppied(user2);
+
         tcpManagerThread.interrupt();
         println("GameServer: Stopped");
     }
