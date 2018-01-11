@@ -11,7 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import logic.GameModel;
 
-public class TCPGameServer implements Runnable {
+public class GameCommTCP implements Runnable {
 
     //TCP
     private Socket cOne = null;
@@ -32,20 +32,20 @@ public class TCPGameServer implements Runnable {
     boolean playerOne = true;
     private boolean stop = false;
 
-    public TCPGameServer(String user1, InetAddress cOneAdress, int cOneport, String user2, InetAddress cTwoAdress, int cTwoport) {
-        this.user1 = user1;
-        this.user2 = user2;
+    public GameCommTCP(String user1, InetAddress cOneAdress, int cOneport, String user2, InetAddress cTwoAdress, int cTwoport) {
         try {
+            this.user1 = user1;
             cOne = new Socket(cOneAdress, cOneport);
             System.out.println("Adress: " + cOneAdress + " and Port: " + cOneport);
+            this.user2 = user2;
             cTwo = new Socket(cTwoAdress, cTwoport);
             System.out.println("Adress: " + cTwoAdress + " and Port: " + cTwoport);
 
         } catch (IOException e) {
             System.err.println("TCPGameServer: Error creating sockets. INSURE CLIENTS ARE RUNNING!");
         }
-        long num = System.currentTimeMillis();
-        fileName = "savedgame" + user1 + user2 + ".bin";
+        //long num = System.currentTimeMillis();
+        fileName = user1 + user2 + ".bin";
     }
 
 //    stream start for both clients
@@ -102,7 +102,7 @@ public class TCPGameServer implements Runnable {
             //Note to self:
             //So yeah, if the client kills the socket, there is no way of knowing it unless you try to write to it.
             //So our approach shoul be wrapp around it and make shure it does not blow anything...
-            //isClosed() and the others work if TCPGameServer kill the server, but not from the other end.
+            //isClosed() and the others work if GameCommTCP kill the server, but not from the other end.
         }
         System.out.println("TCPGameServer: updateGame sent! ");
 
@@ -151,7 +151,7 @@ public class TCPGameServer implements Runnable {
         } catch (IOException ex) {
             System.out.print("TCPGameServer: Error saving game" + ex + " ");
         } catch (ClassNotFoundException ex) {
-            Logger.getLogger(TCPGameServer.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(GameCommTCP.class.getName()).log(Level.SEVERE, null, ex);
         }
         return model;
     }
@@ -180,8 +180,8 @@ public class TCPGameServer implements Runnable {
             //start streams here?
             while (!Thread.currentThread().isInterrupted()) {
                 startStreams();
-                updatePlayers(cOneOut, "Player1");
-                updatePlayers(cTwoOut, "Player2");
+                updatePlayers(cOneOut, user1);
+                updatePlayers(cTwoOut, user2);
 
                 while (!stop) // insert condition to end while
                 {
@@ -227,6 +227,8 @@ public class TCPGameServer implements Runnable {
         } catch (IOException e) {
             //Sockets closed abruptly
             //deleteFile();
+
+            //getFile and update database with it, MAYBE
             shutdownStreams();
             //write to mySQL server
 

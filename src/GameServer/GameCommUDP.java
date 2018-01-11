@@ -3,7 +3,7 @@ package GameServer;
 import java.io.*;
 import java.net.*;
 
-public class UDPClient {
+public class GameCommUDP {
 
     public static final int BUFSIZE = 3500;
 
@@ -16,7 +16,7 @@ public class UDPClient {
     ObjectOutputStream out;
     ByteArrayOutputStream bOut;
 
-    public UDPClient(String clientName, int port) {
+    public GameCommUDP(String clientName, int port) {
         this.clientName = clientName;
         this.port = port;
         try {

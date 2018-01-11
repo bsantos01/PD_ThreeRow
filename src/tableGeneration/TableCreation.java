@@ -90,6 +90,16 @@ public class TableCreation {
                     + "  PRIMARY KEY (id)\n"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 
+            //Status:
+            //???request
+            //inCreation
+            //inGame
+            //finished
+            //interrupted
+            //Winner:
+            //user1
+            //user2
+            //null
             System.out.println("TableCreation: Pairs generated!");
 
         } else {

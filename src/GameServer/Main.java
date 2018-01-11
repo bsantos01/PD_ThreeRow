@@ -2,18 +2,50 @@ package GameServer;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Main {
 
     public static void main(String[] args) throws IllegalStateException, ClassNotFoundException {
 
-        GameServer server;
+        String ipAndPort = "localhost:3306";
+        GameLauncher server;
+        GameDBHandler database = new GameDBHandler(ipAndPort);
+        List<Pair> pairs = new ArrayList<>();
+
         try {
-            server = new GameServer(InetAddress.getLocalHost(), "7777", InetAddress.getLocalHost(), "8888");
+            pairs = database.getPairs();
+        } catch (SQLException ex) {
+            System.err.println("Game Server SQLException - DB " + ex);
+
+            //testing purposes
+            try {
+                server = new GameLauncher(InetAddress.getLocalHost(), "7777", InetAddress.getLocalHost(), "8888");
+                server.start();
+
+            } catch (UnknownHostException e) {
+                System.err.println("Game Main Error - InetAdress " + e);
+            }
+        }
+
+        for (Pair p : pairs) {
+//            try {
+//                InetAddress addr1 = InetAddress.getByName(database.getIPbyUsername(p.getUser1()));
+//                String port1 = database.getPortbyUsername(p.getUser1());
+//
+//                InetAddress addr2 = InetAddress.getByName(database.getIPbyUsername(p.getUser2()));
+//                String port2 = database.getPortbyUsername(p.getUser2());
+
+            server = new GameLauncher(ipAndPort, p);
             server.start();
 
-        } catch (UnknownHostException ex) {
-            System.err.println("Game Server Main Error - InetAdress");
+//            } catch (SQLException ex) {
+//                System.err.println("Game Server SQLException Error - InetAdress");
+//            } catch (UnknownHostException ex) {
+//                System.err.println("Game Server Main Error - InetAdress");
+//            }
         }
 
     }

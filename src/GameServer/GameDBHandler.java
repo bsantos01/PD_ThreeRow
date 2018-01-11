@@ -1,19 +1,14 @@
 package GameServer;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashMap;
-import java.util.Map;
-import logic.GameModel;
+import java.util.ArrayList;
+import java.util.List;
 
-public class DbHandler {
+public class GameDBHandler {
 
     Connection myConn;
     Statement myStmt;
@@ -24,7 +19,7 @@ public class DbHandler {
 
     String ipAndPort;
 
-    public DbHandler(String ipAndPort) {
+    public GameDBHandler(String ipAndPort) {
         myConn = null;
         myStmt = null;
         rs = null;
@@ -36,10 +31,11 @@ public class DbHandler {
     }
 
     //re-think this
-    public Map<String, String> getPairs() throws SQLException {
-        Map<String, String> Pairs = new HashMap<>();
+    public List<Pair> getPairs() throws SQLException {
+        List<Pair> pair = new ArrayList<>();
+
         connect();
-        rs = myStmt.executeQuery("SELECT * FROM Pairs WHERE active=TRUE AND status=???;");
+        rs = myStmt.executeQuery("SELECT * FROM Pairs WHERE status=inCreation;");
 
         if (rs.next() == false) {
             System.out.println("No pairs waiting.");
@@ -47,77 +43,73 @@ public class DbHandler {
         } else {
 
             do {
-                Pairs.put(rs.getString("user1"), rs.getString("user2"));
+                pair.add(new Pair(rs.getInt("id"), rs.getString("user1"), rs.getString("user2"), rs.getString("status"), rs.getString("winner")));
             } while (rs.next());
         }
         close();
-        return Pairs;
+        return pair;
     }
 
     public String getPortbyUsername(String username) throws SQLException {
-        String ret;
+        String port;
         connect();
         rs = myStmt.executeQuery("SELECT port FROM Client WHERE username='" + username + "';");
 
         if (rs.next() != false) {
-            ret = rs.getString("port");
+            port = rs.getString("port");
         } else {
-            ret = null;
+            port = null;
         }
 
         close();
-
-        return ret;
+        return port;
     }
 
     public String getIPbyUsername(String username) throws SQLException {
-        String ret;
+        String ip;
         connect();
         rs = myStmt.executeQuery("SELECT ip FROM Client WHERE username='" + username + "';");
 
         if (rs.next() != false) {
-            ret = rs.getString("ip");
+            ip = rs.getString("ip");
         } else {
-            ret = null;
+            ip = null;
         }
 
         close();
-
-        return ret;
+        return ip;
     }
 
-    public boolean saveUnfinishedGame(String user1, String user2, GameModel game) throws SQLException, IOException { //byte[] byteGame
-
-        //this be a level up
-        byte[] gameByte;
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(bos);
-        oos.writeObject(game);
-        oos.flush();
-        gameByte = bos.toByteArray();
-        oos.close();
-        bos.close();
-
-        PreparedStatement myPrepStmt;
-        connect();
-
-        myPrepStmt = myConn.prepareStatement("INSERT INTO SAVEGAME(user1, user2, game)) VALUES(?, ?, ?)");
-        myPrepStmt.setString(1, "somefilename");
-        myPrepStmt.setString(2, "somefilename");
-        myPrepStmt.setObject(3, gameByte);//data has to be byte[]
-        myPrepStmt.executeUpdate();
-
-        close();
-
-        return true;
-    }
-
+//    public boolean saveUnfinishedGame(String user1, String user2, GameModel game) throws SQLException, IOException { //byte[] byteGame
+//
+//        //this be a level up
+//        byte[] gameByte;
+//        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+//        ObjectOutputStream oos = new ObjectOutputStream(bos);
+//        oos.writeObject(game);
+//        oos.flush();
+//        gameByte = bos.toByteArray();
+//        oos.close();
+//        bos.close();
+//
+//        PreparedStatement myPrepStmt;
+//        connect();
+//
+//        myPrepStmt = myConn.prepareStatement("INSERT INTO SAVEGAME(user1, user2, game)) VALUES(?, ?, ?)");
+//        myPrepStmt.setString(1, "somefilename");
+//        myPrepStmt.setString(2, "somefilename");
+//        myPrepStmt.setObject(3, gameByte);//data has to be byte[]
+//        myPrepStmt.executeUpdate();
+//
+//        close();
+//
+//        return true;
+//    }
     private void connect() {
         try {
             //connection to database
+
             myConn = DriverManager.getConnection("jdbc:mysql://" + ipAndPort + "/teste?verifyServerCertificate=false&useSSL=true", user, pass);
-            //localhost:3306
-            // Create a statement
             myStmt = myConn.createStatement();
         } catch (SQLException exc) {
             exc.printStackTrace();
@@ -129,7 +121,6 @@ public class DbHandler {
                     System.out.println("GameServer DbHandler Connecting SQLException " + ex);
                 }
             }
-
         }
     }
 
@@ -176,15 +167,40 @@ public class DbHandler {
         }
     }
 
-    void setStatusX(String string) {
+    void setInGame(int id) {
         try {
             connect();
-            myStmt.executeUpdate("UPDATE Pairs SET status=??? where username='" + string + "';");
+            myStmt.executeUpdate("UPDATE Pairs SET status=inGame where id='" + id + "';");
 
             close();
         } catch (SQLException ex) {
-            System.out.println("GameServer DbHandler setStatusX SQLException " + ex);
+            System.out.println("GameServer DbHandler setInGame SQLException " + ex);
         }
+    }
+
+    void setInterrupted(int id) {
+        try {
+            connect();
+            myStmt.executeUpdate("UPDATE Pairs SET status=interrupted where id='" + id + "';");
+
+            close();
+        } catch (SQLException ex) {
+            System.out.println("GameServer DbHandler setInGame SQLException " + ex);
+        }
+
+    }
+
+    void setWinner(int id, String username) {
+        try {
+            connect();
+            myStmt.executeUpdate("UPDATE Pairs SET winner='" + username + "' where id='" + id + "';");
+            myStmt.executeUpdate("UPDATE Pairs SET status=finished where id='" + id + "';");
+
+            close();
+        } catch (SQLException ex) {
+            System.out.println("GameServer DbHandler setInGame SQLException " + ex);
+        }
+
     }
 
 }

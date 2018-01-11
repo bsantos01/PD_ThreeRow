@@ -42,7 +42,7 @@ public final class GameClientConnector implements Runnable {
 
     public void objectUpdate(Object obj) throws InterruptedException, IOException {
         if (obj instanceof String) {
-            if (obj.equals("Player1") || obj.equals("Player2")) {
+            if (obj.equals(player)) {
 
                 System.out.println("GameClientConnector: String to play recieved! I'm player " + player);
                 updateCentralServer("Ok");
@@ -123,7 +123,6 @@ public final class GameClientConnector implements Runnable {
                     objectUpdate(obj);
                     System.out.println("GameClientConnector: objectUpdate(obj)");
 
-                    //and here!
                     if (game != null) {
 
                         while (game.getGame().getCurrentPlayerName().equals(player) && !game.getGame().isOver()) {
