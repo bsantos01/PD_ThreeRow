@@ -39,17 +39,20 @@ public class GameLauncher {
             user1 = p.getUser1();
             user2 = p.getUser2();
 
-            InetAddress addr1 = InetAddress.getByName(database.getIPbyUsername(user1));
-            String port1 = database.getPortbyUsername(user1);
-            InetAddress addr2 = InetAddress.getByName(database.getIPbyUsername(user2));
-            String port2 = database.getPortbyUsername(user2);
+            if (database.isActive(user1) && database.isActive(user2)) {
 
-            this.serviceAddress = addr1;
-            this.serviceAddress2 = addr2;
-            this.servicePort = Integer.parseInt(port1);
-            this.servicePort2 = Integer.parseInt(port2);
+                InetAddress addr1 = InetAddress.getByName(database.getIPbyUsername(user1));
+                String port1 = database.getPortbyUsername(user1);
+                InetAddress addr2 = InetAddress.getByName(database.getIPbyUsername(user2));
+                String port2 = database.getPortbyUsername(user2);
 
-            this.hasStarted = false;
+                this.serviceAddress = addr1;
+                this.serviceAddress2 = addr2;
+                this.servicePort = Integer.parseInt(port1);
+                this.servicePort2 = Integer.parseInt(port2);
+
+                this.hasStarted = false;
+            }
         } catch (SQLException ex) {
             System.err.println("GameLauncher: SQLException Error - InetAdress");
         } catch (UnknownHostException ex) {

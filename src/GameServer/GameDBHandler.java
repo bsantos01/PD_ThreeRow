@@ -65,6 +65,18 @@ public class GameDBHandler {
         return port;
     }
 
+    public boolean isActive(String username) throws SQLException {
+        connect();
+        rs = myStmt.executeQuery("SELECT port FROM Client WHERE username='" + username + "';");
+
+        if (rs.next() != false) {
+            return rs.getBoolean("active");
+        }
+
+        close();
+        return false;
+    }
+
     public String getIPbyUsername(String username) throws SQLException {
         String ip;
         connect();

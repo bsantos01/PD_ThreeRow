@@ -22,7 +22,7 @@ public class Main {
 
             //testing purposes
             try {
-                server = new GameLauncher(InetAddress.getLocalHost(), "7777", InetAddress.getLocalHost(), "8888");
+                server = new GameLauncher(InetAddress.getByName("localhost"), "7777", InetAddress.getByName("localhost"), "8888");
                 server.start();
 
             } catch (UnknownHostException e) {
