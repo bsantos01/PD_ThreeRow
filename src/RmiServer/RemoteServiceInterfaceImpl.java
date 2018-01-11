@@ -1,6 +1,10 @@
 package RmiServer;
 
+import RmiClient.Player;
+import java.rmi.AlreadyBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.List;
 import java.util.Map;
@@ -11,8 +15,14 @@ public class RemoteServiceInterfaceImpl extends UnicastRemoteObject implements R
     }
 
     @Override
+    public String getTheTruth() throws RemoteException {
+
+        return "Hell yeah!";
+        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
     public List<Player> getUsersLogged() throws RemoteException {
-        //DBHandler get Users, create Players, return
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -26,11 +36,38 @@ public class RemoteServiceInterfaceImpl extends UnicastRemoteObject implements R
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-    @Override
-    public String getTheTruth() throws RemoteException {
+    public static void main(String[] args) {
 
-        return "Hell yeah!";
-        //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        String registration;
+        RemoteServiceInterfaceImpl server = null;
+        try {
+            Registry r;
+            try {
+                r = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+            } catch (RemoteException e) {
+                System.out.println("RmiServer: RemoteException " + e);
+
+                r = LocateRegistry.getRegistry();
+            }
+            try {
+                server = new RemoteServiceInterfaceImpl();
+
+                registration = "rmi://localhost/ServidorGestao";
+                r.bind("ServidorGestao", server);
+                //Stuff hapends
+                //Naming.unbind(registration);
+
+            } catch (AlreadyBoundException ex) {
+                System.out.println("RmiServer: Url Exception " + ex);
+//            } catch (NotBoundException ex) {
+//                System.out.println("RmiServer: NotBoundException" + ex);
+            } catch (Exception ex) {
+                System.out.println("RmiServer: Exception - Probably bind it's already registered... " + ex);
+            }
+
+        } catch (RemoteException ex) {
+            System.out.println("RmiServer: RemoteException 2 " + ex);
+        }
     }
 
 }

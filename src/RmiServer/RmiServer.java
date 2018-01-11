@@ -1,6 +1,5 @@
 package RmiServer;
 
-import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.Remote;
@@ -28,11 +27,13 @@ public class RmiServer {
                 server = new RemoteServiceInterfaceImpl();
 
                 registration = "rmi://localhost/ServidorGestao";
+//                r.bind(registration, server);
+                System.err.println("RmiServer: " + registration);
                 Naming.bind(registration, server);
                 //Stuff hapends
                 //Naming.unbind(registration);
 
-            } catch (MalformedURLException | AlreadyBoundException ex) {
+            } catch (AlreadyBoundException ex) {
                 System.out.println("RmiServer: Url Exception " + ex);
 //            } catch (NotBoundException ex) {
 //                System.out.println("RmiServer: NotBoundException" + ex);

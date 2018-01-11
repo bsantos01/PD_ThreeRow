@@ -1,4 +1,4 @@
-package RmiClient;
+
 
 import java.rmi.Remote;
 
