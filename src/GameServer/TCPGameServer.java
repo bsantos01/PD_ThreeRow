@@ -7,6 +7,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import logic.GameModel;
 
 public class TCPGameServer implements Runnable {
@@ -65,7 +67,13 @@ public class TCPGameServer implements Runnable {
     public void objectUpdate(Object obj) {
         if (obj instanceof String) {
             if (((String) obj).equalsIgnoreCase("Ok")) {
-                game = new Game(user1, user2);
+                GameModel model = getFile(fileName);
+                if (model != null) {
+                    game = new Game(user1, user2);
+                    game.setGame(model);
+                } else {
+                    game = new Game(user1, user2);
+                }
                 System.out.println("TCPGameServer: Both players ready! ");
             } else if (((String) obj).equalsIgnoreCase("CLOSING")) {
                 shutdownStreams();
@@ -132,6 +140,20 @@ public class TCPGameServer implements Runnable {
             System.out.print("TCPGameServer: interrupted Shutdown error " + ex + " ");
         }
 
+    }
+
+    public GameModel getFile(String fileName) {
+        GameModel model = null;
+        try {
+            file = new File(fileName);
+            model = (GameModel) FileUtility.retrieveGameFromFile(file);
+            System.out.println("TCPGameServer: Game saved as file!");
+        } catch (IOException ex) {
+            System.out.print("TCPGameServer: Error saving game" + ex + " ");
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(TCPGameServer.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return model;
     }
 
     public void saveFile() {
