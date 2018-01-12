@@ -217,5 +217,30 @@ public class DBhandler {
                 close();
             } catch (SQLException ex) {
                 Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
-            }    }
+            }    
+    }
+    
+        void createMatch(String P1, String P2){
+    
+            try {
+               connect();
+        
+               myStmt.executeUpdate("INSERT INTO PAIRS(user1, user2, status, winner) VALUES('"+P1+"', '"+P2+"' ,'inCreation', 'none');");    
+                               myStmt.executeUpdate("UPDATE Client SET ingame=true where username='"+P1+"';");
+                               myStmt.executeUpdate("UPDATE Client SET ingame=true where username='"+P2+"';");
+               close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
+
+    void logout(String string) {
+            try {
+               connect();
+               myStmt.executeUpdate("UPDATE Client where username= "+string+" SET active=false, ip='', port='' ;");
+               close();
+            } catch (SQLException ex) {
+                Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+            }
+    }
 }

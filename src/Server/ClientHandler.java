@@ -49,6 +49,9 @@ public class ClientHandler implements Runnable {
             if (!arr[1].equals("yes")) {
                 uh.freePlayer(arr[2]);
                 uh.freePlayer(arr[3]);
+            }else
+            {
+                uh.createMatch(arr[2], arr[3]);
             }
         }
     }
@@ -93,11 +96,22 @@ public class ClientHandler implements Runnable {
                                 System.out.println("accept " + arr[1] + " " + username + " " + pedido.get(username));
                                 AcceptGame(("accept " + arr[1] + " " + username + " " + pedido.get(username)));//chama função de avaliação da resposta
 
-                            } else if (arr[0].equals("list"))//caso seja a resposta a um pedido de um cliente
+                            } else if (arr[0].equals("list"))//caso seja o pedido de lista
                             {
                                 PlayerOut.get(username).writeObject(uh.getFreePlayers());
                                 PlayerOut.get(username).flush();
-                            } else {
+                            } else if (arr[0].equals("logout"))
+                            {//caso seja a resposta a um pedido de um cliente 
+                                uh.logout(username);
+                                PlayerIn.get(username).close();
+                                PlayerIn.remove(username);
+                                PlayerOut.get(username).close();
+                                PlayerOut.remove(username);
+                                PlayerSocket.get(username).close();
+                                PlayerSocket.remove(username);
+                                Thread.currentThread().interrupt(); 
+                            }
+                            else {
                                 PlayerOut.get(username).writeObject("Comando Invalido"); //envia mensagem ao cliente da thread
                             }
                             PlayerOut.get(username).flush();
