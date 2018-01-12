@@ -100,6 +100,17 @@ public class ClientHandler implements Runnable {
                             {
                                 PlayerOut.get(username).writeObject(uh.getFreePlayers());
                                 PlayerOut.get(username).flush();
+                            }else if (arr[0].equals("msgto"))//caso seja o pedido de lista
+                            {
+                                PlayerOut.get(arr[1]).writeObject(temp);
+                                PlayerOut.get(arr[1]).flush();
+                            }else if (arr[0].equals("msgall"))//caso seja o pedido de lista
+                            {
+                                for(Map.Entry<String, String> entry : pedido.entrySet()) {
+                                    String key = entry.getKey();
+                                    PlayerOut.get(key).writeObject(temp);
+                                    PlayerOut.get(key).flush();
+                                }
                             } else if (arr[0].equals("logout"))
                             {//caso seja a resposta a um pedido de um cliente 
                                 uh.logout(username);
