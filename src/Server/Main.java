@@ -2,7 +2,6 @@ package Server;
 
 /**
  *
- * @author Bruno Santos
  */
 public class Main {
 
