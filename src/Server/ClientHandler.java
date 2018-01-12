@@ -1,107 +1,122 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStream;
-import java.io.PipedInputStream;
-import java.io.PipedOutputStream;
-import java.io.PrintStream;
 import java.net.Socket;
-import java.sql.SQLException;
+import java.net.SocketException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Bruno Santos
  */
-public class ClientHandler implements Runnable{
+public class ClientHandler implements Runnable {
 
-    Map<String,ClientT> PlayerThread;
-    PipedInputStream Tin;
-    PipedOutputStream Cout;
+    Map<String, Socket> PlayerSocket;
+    Map<String, Thread> PlayerThread;
+    Map<String, ObjectInputStream> PlayerIn;
+    Map<String, ObjectOutputStream> PlayerOut;
+    Map<String, String> pedido;
+    int numLogs;
+
     DBhandler uh;
-    
-    ClientHandler() throws IOException{
-        PlayerThread= new HashMap<String, ClientT>();
-        Cout = new PipedOutputStream();
-	Tin = new PipedInputStream(Cout);
-        uh= new DBhandler();
+
+    ClientHandler() throws IOException {
+        pedido = new HashMap<String, String>();
+        PlayerThread = new HashMap<String, Thread>();
+        PlayerSocket = new HashMap<String, Socket>();
+        PlayerIn = new HashMap<String, ObjectInputStream>();
+        PlayerOut = new HashMap<String, ObjectOutputStream>();
+        uh = new DBhandler();
+
     }
-    
+
     @Override
     public void run() {
+        while (true) {
 
-        while(true){
-            try {
-                StringBuilder sb = new StringBuilder();
-                int input = Tin.read();
-                
-                while (input != -1){ //EOF               
-                    sb.append((char)input);
-                    input = Tin.read();
-                    if((char)input=='?')
-                        break;
-                }
-                
-                String str = sb.toString();
-              
-                if(str.length()>8){
-                    
-                    
-                    String[] arr = str.split("[\\W]");
+        }
+    }
 
-                    if(arr[0].equals("game")){ //arranca thread que envia pedido ao jogador 2 para formar jogo
-                        uh.setOcuppied(arr[1]); //mete os players como ocupados
-                        uh.setOcuppied(arr[2]);
-                        
-                        //envia directamente para o socket do cliente o pedido com o username do user que pediu
-                        PlayerThread.get(arr[1]).ToClientRequest(arr[2]); 
-                    }
-                    else if(arr[0].equals("gamereq"))
-                    {
-                      //arranca jogo
-                        if (arr[1].equals("yes")){
-                            
-                        } else
-                        {
-                            uh.freePlayer(arr[2]);
-                            uh.freePlayer(arr[3]);
-                        }
-                    }    
-                }
-
-                 
-            } catch (IOException ex) {
-                    Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
+    public void AcceptGame(String msg) {
+        String[] arr = msg.split("[\\W]");
+        if (arr[0].equals("accept")) {
+            if (!arr[1].equals("yes")) {
+                uh.freePlayer(arr[2]);
+                uh.freePlayer(arr[3]);
             }
         }
     }
-    
 
+    public void addNewClient(String username, Socket ToClient, ObjectInputStream in, ObjectOutputStream out) throws IOException {
 
-    
-    public void addNewClient(String username, Socket ToClient, ObjectInputStream in, ObjectOutputStream out) throws IOException{
+        System.out.println("vou tentar addiconar a tread do " + username);
+        PlayerSocket.put(username, ToClient);
+        PlayerIn.put(username, in);
+        PlayerOut.put(username, out);
 
-        System.out.println("entrei " + username);
-        
-        
-        ClientT Client = new ClientT(Cout, ToClient, username, in, out);
-        Client.setDaemon(true);
-        Client.start();
-        PlayerThread.put(username,Client);
-        
-        
+        Thread thread = new Thread(new Runnable() {
+            public String username;
+            String tempUser;
+
+            public void setUser(String user) {
+                username = user;
+            }
+
+            @Override
+            public void run() {
+                Thread thread = Thread.currentThread();
+                setUser(thread.getName());
+                ObjectInputStream in = PlayerIn.get(username);
+                while (true) {
+                    try {
+                        Object temp = in.readObject();
+
+                        if (temp != null) {
+                            String msg = (String) temp;
+
+                            String[] arr = msg.split("[\\W]");
+
+                            if (arr[0].equals("gamereq")) //pretende iniciar um jogo, nos seguintes argumentos estarão mais dados
+                            {
+                                PlayerOut.get(arr[1]).writeObject(("gamereq " + username));   //envia mensagem ao cliente com que se pretende iniciar o jogo
+                                pedido.put(arr[1], username);
+                                PlayerOut.get(arr[1]).flush();
+
+                            } else if (arr[0].equals("accept") || tempUser != null)//caso seja a resposta a um pedido de um cliente
+                            {
+                                System.out.println("accept " + arr[1] + " " + username + " " + pedido.get(username));
+                                AcceptGame(("accept " + arr[1] + " " + username + " " + pedido.get(username)));//chama função de avaliação da resposta
+
+                            } else if (arr[0].equals("list"))//caso seja a resposta a um pedido de um cliente
+                            {
+                                PlayerOut.get(username).writeObject(uh.getFreePlayers());
+                                PlayerOut.get(arr[0]).flush();
+                            } else {
+                                PlayerOut.get(username).writeObject("Comando Invalido"); //envia mensagem ao cliente da thread
+                            }
+                            PlayerOut.get(username).flush();
+                        }
+                    } catch (ClassNotFoundException ex) {
+
+                    } catch (SocketException e) {
+                        System.out.println(">>>SocketFechado");
+
+                        return;
+                    } catch (IOException ex) {
+
+                    }
+                }
+
+            }
+
+        });
+
+        thread.setName(username);
+        PlayerThread.put(username, thread);
+        thread.start();
     }
-    
+
 }
