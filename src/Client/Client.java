@@ -58,11 +58,22 @@ public final class Client {
 
     public void ScListener() {
 
+        String[] arr = null ;
         while (true) {
             try {
                 System.out.println("Execute Comando");
                 Object temp = (String) sc.nextLine();
-                out.writeObject(temp);
+                if (temp != null) {
+                            String msg = (String) temp;
+
+                            arr = msg.split("[\\W]");
+                }
+                if (arr[0].equals("help")){
+                    ShowHelp();
+                }
+                else{
+                    out.writeObject(temp);
+                }
             } catch (IOException ex) {
                 Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -126,5 +137,15 @@ public final class Client {
             }
         }
     });
+
+    private void ShowHelp() {
+        System.out.println("-----------------Comandos-----------------");
+        System.out.println("|gamereq user                            |");
+        System.out.println("|accept yes/no                           |");
+        System.out.println("|list                                    |");
+        System.out.println("|                                        |");
+        System.out.println("|                                        |");
+        System.out.println("------------------------------------------");
+    }
 
 }

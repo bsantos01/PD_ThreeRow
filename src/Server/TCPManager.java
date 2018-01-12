@@ -29,6 +29,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
         this.serverName = serverName;
 
         serverTCPSocket = new ServerSocket(6001);
+        println("Starting DBhandler . . . ");
         uh = new DBhandler();
         StartClientHandler();
         System.out.println("Port " + serverTCPSocket.getLocalPort() + " ");
