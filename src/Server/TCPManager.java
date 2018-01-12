@@ -1,21 +1,12 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import static java.sql.DriverManager.println;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
+import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -25,184 +16,121 @@ import java.util.logging.Logger;
  */
 public class TCPManager implements Runnable//, ClientHandlerCallback
 {
+
     //TCP
     private final String serverName;
     private final ServerSocket serverTCPSocket;
-     ObjectInputStream in;
-     ObjectOutputStream out;
-    protected List<ClientPair> Pairs;
-    static int ngames;
-    
-    //private final Map<Long, ClientInfo> clients;
-    //private final Map<Long, ClientHandler> clientHandlers;
-    private final Map<Long, Thread> clientHandlerThreads;
-    
-    public TCPManager(String serverName) throws IOException
-    {
+
+    DBhandler uh;
+    private Thread ClientHandlerThread;
+    private ClientHandler CHandler;
+
+    public TCPManager(String serverName) throws IOException {
         this.serverName = serverName;
-        Pairs= new ArrayList();
+
         serverTCPSocket = new ServerSocket(6001);
-        ngames=0;
+        uh = new DBhandler();
+        StartClientHandler();
         System.out.println("Port " + serverTCPSocket.getLocalPort() + " ");
-        
-      //  clients = new ConcurrentHashMap();
-        //clientHandlers = new ConcurrentHashMap();
-        clientHandlerThreads = new ConcurrentHashMap();
+
     }
-    
-    public String getPairs(){
-        String listPairs="";
-        
-        for(int i=0; i<Pairs.size(); i++){
-            listPairs.concat(Pairs.get(i).toString());
-            System.out.println(Pairs.get(i).toString());
-        }
+
+    public void StartClientHandler() throws IOException {
+
+        println("Starting ClientHandler . . . ");
+
+        CHandler = new ClientHandler();
+        ClientHandlerThread = new Thread(CHandler);
+        ClientHandlerThread.setDaemon(true);
+        ClientHandlerThread.start();
+    }
+
+    public String getPairs() {
+        String listPairs = "";
 
         return listPairs;
     }
-    
+
+    public void killPlayers() throws SQLException {
+        uh.killPlayers();
+    }
+
     @Override
-    public void run()
-    {
+    public void run() {
         //registar instância do TCPManager para threads mais "exteriores" poderem aceder a alguns dados
-       // GlobalReferences.registerReference(GlobalReferences.ReferenceType.TCP_MANAGER, this);
-
-
-        try
-        {
-            String temp=null;
-            Client waiting=null, next;
-            Socket nextClient;
-
-           // ClientHandler clientHandler;
-
-            
-            while(!Thread.currentThread().isInterrupted())
-            {
-             
+        // GlobalReferences.registerReference(GlobalReferences.ReferenceType.TCP_MANAGER, this);
+        while (!Thread.currentThread().isInterrupted()) {
+            try {
+                final Socket nextClient;
                 nextClient = serverTCPSocket.accept();
                 System.out.println("TCPManager: new client accepted");
-                out = new ObjectOutputStream(nextClient.getOutputStream());
-                in = new ObjectInputStream(nextClient.getInputStream());
-                
-                
-             
-                temp= (String) in.readObject();
-                
 
-                if (temp.equals("TonyRamos")){
-                    next= new Client(nextClient, out, in);
-                    out.writeObject("Login Sucessfull!");
-                    out.flush();
-                    
-                    if(waiting==null){
-                        waiting=next;
-                        
-                    }else{
-                        Pairs.add(new ClientPair(waiting, next, ngames++));
-                        waiting=null;
-                        System.out.println("new pair created");
+                Thread Login = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            String arr[];
+                            int control = 0;
+                            String temp = null;
+                            Socket Client = nextClient;
+                            final ObjectInputStream in;
+                            final ObjectOutputStream out;
+                            out = new ObjectOutputStream(Client.getOutputStream());
+                            in = new ObjectInputStream(Client.getInputStream());
+
+                            do {
+
+                                temp = (String) in.readObject();
+
+                                arr = temp.split("[\\W]");
+
+                                if (arr[0].equalsIgnoreCase("Register")) {
+                                    if (uh.register(arr[1], arr[2])) {
+                                        out.writeObject("Sucefully registered, player " + arr[1] + ".");
+                                        control = 1;
+                                    } else {
+                                        out.writeObject("Impossible to register.");
+                                    }
+                                    out.flush();
+                                } else {
+                                    if (arr[0].equalsIgnoreCase("Login")) {
+                                        if (uh.login(arr[1], arr[2], nextClient.getInetAddress(), nextClient.getPort())) {
+                                            out.writeObject("Sucefully logged in, player " + arr[1] + ".");
+                                            control = 1;
+                                        } else {
+                                            out.writeObject("Faulty login");
+                                        }
+                                        out.flush();
+                                    } else {
+                                        System.out.println("TCPManager: Rejected client, faulty login data");
+                                    }
+                                }
+
+                            } while (control == 0);
+
+                            if (control == 1) {
+                                CHandler.addNewClient(arr[1], nextClient, in, out);
+                            }
+                        } catch (IOException ex) {
+                            Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (ClassNotFoundException ex) {
+                            Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (SQLException ex) {
+                            Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
+                        } catch (CustomException ex) {
+                            Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+
                     }
-                    
-                }
-                else
-                {
-                    System.out.println("TCPManager: Rejected client, faulty login data");
-                }
-                
+                });
 
-                
+                Login.setDaemon(true);
+                Login.start();
+            } catch (IOException ex) {
+                Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
-        catch(IOException e)
-        {
-            //printError(e);
-        } catch (ClassNotFoundException ex) {
-            Logger.getLogger(TCPManager.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        finally
-        {
-//            try
-//            {
-//                shutdown();
-//            }
-//            catch(IOException e)
-//            {
-//                
-//            }
-        }
+
     }
-    
-//    @Override
-//    public synchronized void clientHasConnected(ClientInfo clientInfo, long clientID)
-//    {
-//        //register clientInfo to the clients map
-//        clients.put(clientID, clientInfo);
-//        
-//        println("TCPManager: client " + clientInfo.getClientName() + " connected");
-//    }
-//    
-//    @Override
-//    public synchronized void clientHasDisconnected(ClientInfo clientInfo, long clientID)
-//    {
-//        try
-//        {
-//            //interrupt ClientListener Thread
-//            clientHandlerThreads.get(clientID).interrupt();
-//            
-//            clientHandlers.get(clientID).disconnect(false);
-//            
-//            //map it's value to null for future references (null means that no ClientListener Thread
-//            //is running for clientID client, meanning clientID is NOT active)
-//            //CORRECTION: HashMaps do NOT accept null keys or values (just check if the thread is interrupted or not)
-//            //clientHandlers.put(clientID, null);
-//            //clientHandlerThreads.put(clientID, null);
-//        }
-//        catch(IOException e)
-//        {
-//            printError(e);
-//        }
-//        
-//        println("TCPManager: client " + (clientInfo != null? clientInfo.getClientName() : "") + " disconnected");
-//    }
-//    
-//    public synchronized InetAddress getTCPAddress() {return serverTCPSocket.getInetAddress();}
-//    public synchronized int getBoundTCPPort() {return serverTCPSocket.getLocalPort();}
-//    
-//    public synchronized ClientInfoList getResgiteredClientList()
-//    {
-//        ClientInfo infoArray[] = new ClientInfo[clients.size()];
-//        
-//        int i = 0;
-//        for(Long key : clients.keySet())
-//            infoArray[i++] = clients.get(key);
-//        
-//        return new ClientInfoList(infoArray);
-//    }
-//    
-//    public synchronized ClientInfoList getActiveClientList()
-//    {
-//        List<ClientInfo> infoList = new ArrayList(clients.size());
-//        
-//        for(Long key : clients.keySet())
-//        {
-//            if(clientHandlerThreads.get(key).isAlive()) //active client  = alive thread
-//                if(clientHandlers.get(key).isLoggedIn() && clientHandlers.get(key).isRegistered())
-//                    infoList.add(clients.get(key));
-//        }
-//        
-//        return new ClientInfoList(infoList.toArray(new ClientInfo[infoList.size()]));
-//    }
-//    
-//    
-//    private void shutdown() throws IOException
-//    {
-//        for(Long l : clientHandlers.keySet())
-//        {
-//            clientHandlerThreads.get(l).interrupt();
-//            clientHandlers.get(l).disconnect(true);
-//        }
-//        
-//        serverTCPSocket.close();
-//    }
+
 }
