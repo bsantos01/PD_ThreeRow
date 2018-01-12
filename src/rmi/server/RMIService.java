@@ -5,13 +5,14 @@
  */
 package rmi.server;
 
-import rmi.commons.RemoteServiceInterface;
-import rmi.commons.ServerMonitorListener;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.List;
+import rmi.commons.RemoteServiceInterface;
+import rmi.commons.ServerMonitorListener;
 
 /**
  *
@@ -20,9 +21,11 @@ import java.util.ArrayList;
 public class RMIService extends UnicastRemoteObject implements RemoteServiceInterface, Runnable {
 
     private static ArrayList<ServerMonitorListener> observers;
+    private String ipAndPort = "";
 
-    public RMIService() throws RemoteException {
-        observers = new ArrayList<ServerMonitorListener>();
+    public RMIService(String ip) throws RemoteException {
+        this.observers = new ArrayList<ServerMonitorListener>();
+        this.ipAndPort = ip;
     }
 
     public void notifyObservers() throws RemoteException {
@@ -30,7 +33,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         for (ServerMonitorListener observer : observers) {
             //if (observer.wait())
             if (observer != null) {
-                observer.printServers();
+                observer.printPairs();
             }
         }
     }
@@ -40,36 +43,28 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         try {
             Registry r;
             try {
-                System.out.println("Tentativa de lancamento do registry no porto "
-                        + Registry.REGISTRY_PORT + "...");
+                System.out.println("RMIService working @ port: " + Registry.REGISTRY_PORT);
                 r = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
-                System.out.println("Registry lancado!");
+
+                System.out.println("RMIService started!");
 
             } catch (RemoteException e) {
-                System.out.println("Registry provavelmente ja' em execucao!");
+                System.out.println("RMIService already executing!");
                 r = LocateRegistry.getRegistry();
             }
 
-            RMIService directoryService = new RMIService();
-
-            System.out.println("Servico RMI criado ");
-
+            RMIService directoryService = new RMIService(ipAndPort);
             r.bind("PD", directoryService);
 
-            System.out.println("Servico DirectoryService registado no registry...");
+            System.out.println("RMIService started...");
 
         } catch (RemoteException e) {
-            System.out.println("Erro remoto - " + e);
+            System.out.println("RMIService RemoteException " + e);
             System.exit(1);
         } catch (Exception e) {
-            System.out.println("Erro - " + e);
+            System.out.println("RMIService Error " + e);
             System.exit(1);
         }
-    }
-
-    @Override
-    public String getServerList() throws RemoteException {
-        return "String Server RMISERVICE";
     }
 
     @Override
@@ -83,6 +78,23 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         if (!observers.isEmpty()) {
             observers.remove(observer);
         }
+    }
+
+    @Override
+    public List<String> getUsers() throws RemoteException {
+        List<String> list = new ArrayList<>();
+        list.add("String Server RMISERVICE");
+        return list;
+    }
+
+    @Override
+    public List<String> getPairs() throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public List<String> getOldGames() throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

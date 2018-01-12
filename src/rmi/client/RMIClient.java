@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package rmi.client;
 
 import java.rmi.Naming;
@@ -13,10 +8,6 @@ import java.rmi.server.UnicastRemoteObject;
 import rmi.commons.RemoteServiceInterface;
 import rmi.commons.ServerMonitorListener;
 
-/**
- *
- * @author simao
- */
 public class RMIClient extends UnicastRemoteObject implements ServerMonitorListener, Runnable {
 
     private String addr;
@@ -35,6 +26,7 @@ public class RMIClient extends UnicastRemoteObject implements ServerMonitorListe
             String registration = "rmi://" + addr + "/PD";
             Remote remoteService = Naming.lookup(registration);
             rmiService = (RemoteServiceInterface) remoteService;
+
             rmiService.addObserver(this);
 
         } catch (NotBoundException e) {
@@ -55,8 +47,9 @@ public class RMIClient extends UnicastRemoteObject implements ServerMonitorListe
     }
 
     @Override
-    public void printServers() throws RemoteException {
-        System.out.println(output);
+    public void printPairs() throws RemoteException {
+        System.out.println("pairs");
 
     }
+
 }

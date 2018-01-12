@@ -32,7 +32,7 @@ public class ClientHandler implements Runnable {
         PlayerSocket = new HashMap<String, Socket>();
         PlayerIn = new HashMap<String, ObjectInputStream>();
         PlayerOut = new HashMap<String, ObjectOutputStream>();
-        uh = new DBhandler();
+        uh = new DBhandler("localhost:3306");
 
     }
 
@@ -49,8 +49,7 @@ public class ClientHandler implements Runnable {
             if (!arr[1].equals("yes")) {
                 uh.freePlayer(arr[2]);
                 uh.freePlayer(arr[3]);
-            }else
-            {
+            } else {
                 uh.createMatch(arr[2], arr[3]);
             }
         }
@@ -120,9 +119,8 @@ public class ClientHandler implements Runnable {
                                 PlayerOut.remove(username);
                                 PlayerSocket.get(username).close();
                                 PlayerSocket.remove(username);
-                                Thread.currentThread().interrupt(); 
-                            }
-                            else {
+                                Thread.currentThread().interrupt();
+                            } else {
                                 PlayerOut.get(username).writeObject("Comando Invalido"); //envia mensagem ao cliente da thread
                             }
                             PlayerOut.get(username).flush();

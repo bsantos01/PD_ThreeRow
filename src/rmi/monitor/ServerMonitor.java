@@ -5,7 +5,6 @@
  */
 package rmi.monitor;
 
-import java.io.IOException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.Remote;
@@ -42,16 +41,9 @@ public class ServerMonitor extends UnicastRemoteObject implements ServerMonitorL
         }
     }
 
-    public void updateView(String s) {
-        try {
-            Runtime.getRuntime().exec("cls");
-        } catch (IOException ex) {
-        }
-        System.out.println(s);
-    }
-
     @Override
-    public void printServers() throws RemoteException {
-        System.err.println("printServers in Monitor");
+    public void printPairs() throws RemoteException {
+        System.err.println("Monitor: pairs");
+
     }
 }

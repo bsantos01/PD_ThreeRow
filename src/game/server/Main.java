@@ -22,6 +22,7 @@ public class Main {
 
             //testing purposes
             try {
+                //192.168.1.2
                 server = new GameLauncher(InetAddress.getByName("localhost"), "7777", InetAddress.getByName("localhost"), "8888");
                 server.start();
 
