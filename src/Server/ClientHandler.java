@@ -96,7 +96,7 @@ public class ClientHandler implements Runnable {
                             } else if (arr[0].equals("list"))//caso seja a resposta a um pedido de um cliente
                             {
                                 PlayerOut.get(username).writeObject(uh.getFreePlayers());
-                                PlayerOut.get(arr[0]).flush();
+                                PlayerOut.get(username).flush();
                             } else {
                                 PlayerOut.get(username).writeObject("Comando Invalido"); //envia mensagem ao cliente da thread
                             }
