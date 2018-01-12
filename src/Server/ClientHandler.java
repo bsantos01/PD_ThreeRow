@@ -7,6 +7,7 @@ import java.net.Socket;
 import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -58,6 +59,12 @@ public class ClientHandler implements Runnable {
     public void addNewClient(String username, Socket ToClient, ObjectInputStream in, ObjectOutputStream out) throws IOException {
 
         System.out.println("vou tentar addiconar a tread do " + username);
+        for (Map.Entry<String, Thread> entry : PlayerThread.entrySet()) {
+            System.out.println(entry.getKey());
+
+            PlayerOut.get(entry.getKey()).writeObject("Login user " + username + " (escreve \"help\" para a lista de comandos)");
+            PlayerOut.get(entry.getKey()).flush();
+        }
         PlayerSocket.put(username, ToClient);
         PlayerIn.put(username, in);
         PlayerOut.put(username, out);
@@ -105,10 +112,11 @@ public class ClientHandler implements Runnable {
                                 PlayerOut.get(arr[1]).flush();
                             }else if (arr[0].equals("msgall"))//caso seja o pedido de lista
                             {
-                                for(Map.Entry<String, String> entry : pedido.entrySet()) {
-                                    String key = entry.getKey();
-                                    PlayerOut.get(key).writeObject(temp);
-                                    PlayerOut.get(key).flush();
+                                for (Map.Entry<String, Thread> entry : PlayerThread.entrySet()) {
+                                    System.out.println(entry.getKey());
+
+                                    PlayerOut.get(entry.getKey()).writeObject(temp);
+                                    PlayerOut.get(entry.getKey()).flush();
                                 }
                             } else if (arr[0].equals("logout"))
                             {//caso seja a resposta a um pedido de um cliente 
