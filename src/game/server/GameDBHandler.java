@@ -65,18 +65,6 @@ public class GameDBHandler {
         return port;
     }
 
-    public boolean isActive(String username) throws SQLException {
-        connect();
-        rs = myStmt.executeQuery("SELECT port FROM Client WHERE username='" + username + "';");
-
-        if (rs.next() != false) {
-            return rs.getBoolean("active");
-        }
-
-        close();
-        return false;
-    }
-
     public String getIPbyUsername(String username) throws SQLException {
         String ip;
         connect();
@@ -90,6 +78,18 @@ public class GameDBHandler {
 
         close();
         return ip;
+    }
+
+    public boolean isActive(String username) throws SQLException {//redo
+        connect();
+        rs = myStmt.executeQuery("SELECT active FROM Client WHERE username='" + username + "';");
+
+        if (rs.next() != false) {
+            return rs.getBoolean("active");
+        }
+
+        close();
+        return false;
     }
 
 //    public boolean saveUnfinishedGame(String user1, String user2, GameModel game) throws SQLException, IOException { //byte[] byteGame
@@ -146,8 +146,6 @@ public class GameDBHandler {
         }
 
     }
-
-    ;
 
     void killPlayers() throws SQLException {
         connect();

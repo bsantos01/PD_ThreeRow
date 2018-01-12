@@ -72,10 +72,9 @@ public class GameLauncher {
             startTCPGameServer();
             heartbeatClient();
 
-            database.setInGame(pair.getId());
-            database.setOcuppied(user1);
-            database.setOcuppied(user2);
-
+//            database.setInGame(pair.getId());
+//            database.setOcuppied(user1);
+//            database.setOcuppied(user2);
             tcpManagerThread.join();
 
         } catch (IOException e) {
@@ -106,10 +105,9 @@ public class GameLauncher {
     private void stopTCPManager() {
         println("GameServer: Stopping GameCommTCP");
 
-        database.setInterrupted(pair.getId());
-        database.setOcuppied(user1);
-        database.setOcuppied(user2);
-
+//        database.setInterrupted(pair.getId());
+//        database.setOcuppied(user1);
+//        database.setOcuppied(user2);
         tcpManagerThread.interrupt();
         println("GameServer: Stopped");
     }
