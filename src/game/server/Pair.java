@@ -1,4 +1,4 @@
-package GameServer;
+package game.server;
 
 public class Pair {
 

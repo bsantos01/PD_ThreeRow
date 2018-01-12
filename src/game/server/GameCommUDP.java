@@ -1,4 +1,4 @@
-package GameServer;
+package game.server;
 
 import java.io.*;
 import java.net.*;

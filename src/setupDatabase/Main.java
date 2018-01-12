@@ -1,4 +1,4 @@
-package tableGeneration;
+package setupDatabase;
 
 import java.io.IOException;
 import java.sql.SQLException;

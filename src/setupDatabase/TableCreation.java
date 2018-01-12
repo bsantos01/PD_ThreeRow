@@ -1,4 +1,4 @@
-package tableGeneration;
+package setupDatabase;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;

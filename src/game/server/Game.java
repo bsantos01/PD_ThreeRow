@@ -1,4 +1,4 @@
-package GameServer;
+package game.server;
 
 import java.util.Observable;
 import java.util.Observer;

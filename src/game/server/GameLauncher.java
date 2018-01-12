@@ -1,4 +1,4 @@
-package GameServer;
+package game.server;
 
 import java.io.IOException;
 import java.net.InetAddress;

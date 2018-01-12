@@ -1,4 +1,4 @@
-package GameServer;
+package game.server;
 
 import files.FileUtility;
 import java.io.File;
