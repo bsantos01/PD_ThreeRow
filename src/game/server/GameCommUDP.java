@@ -7,7 +7,7 @@ public class GameCommUDP {
 
     public static final int BUFSIZE = 3500;
 
-    private String clientName;
+    private String serverManager;
     private int port;
     private InetAddress addr = null;
 
@@ -20,11 +20,11 @@ public class GameCommUDP {
     private String msgs = "";
     private boolean stop = false;
 
-    public GameCommUDP(String clientName, int port) {
-        this.clientName = clientName;
+    public GameCommUDP(String ip, int port) {
+        this.serverManager = ip;
         this.port = port;
         try {
-            addr = InetAddress.getByName("127.0.0.1");
+            addr = InetAddress.getByName(serverManager);
         } catch (UnknownHostException ex) {
             System.err.println("UDP UnknownHostException");
         }
