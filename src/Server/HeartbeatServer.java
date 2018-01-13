@@ -53,7 +53,7 @@ public class HeartbeatServer
         return request;
 
     }
-
+    
     public void processRequests()
     {
         String receivedMsg;
