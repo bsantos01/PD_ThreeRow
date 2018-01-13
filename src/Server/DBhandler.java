@@ -261,7 +261,7 @@ public class DBhandler {
         try {
             connect();
 
-            myStmt.executeUpdate("INSERT INTO PAIRS(user1, user2, status, winner) VALUES('" + P1 + "', '" + P2 + "' ,'inCreation', 'none');");
+            myStmt.executeUpdate("INSERT INTO PAIRS(user1, user2, status, winner) VALUES('" + P1 + "', '" + P2 + "' ,'inRequest', 'none');");
             myStmt.executeUpdate("UPDATE Client SET ingame=true where username='" + P1 + "';");
             myStmt.executeUpdate("UPDATE Client SET ingame=true where username='" + P2 + "';");
             close();
@@ -274,6 +274,37 @@ public class DBhandler {
         try {
             connect();
             myStmt.executeUpdate("UPDATE Client where username= " + string + " SET active=false, ip='', port='' ;");
+            close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    void deleteMatch(String string, String string0) {
+        try {
+            connect();
+            myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='"+ string0 +"' AND status='inRequest';");
+            close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    void cancelMatch(String string, String string0){
+        try {
+            connect();
+            myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='"+ string0 +"' AND status='inCreation';");
+            close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    }
+
+    void updateMatch(String string, String string0) {
+         try {
+            connect();
+            myStmt.executeUpdate("UPDATE pairs SET status='i0nCreation' where user1='" + string + "' AND user2='"+ string0 +"';");
             close();
         } catch (SQLException ex) {
             Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);

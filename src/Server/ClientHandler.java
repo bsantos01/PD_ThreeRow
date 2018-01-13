@@ -50,8 +50,9 @@ public class ClientHandler implements Runnable {
             if (!arr[1].equals("yes")) {
                 uh.freePlayer(arr[2]);
                 uh.freePlayer(arr[3]);
+                uh.deleteMatch(arr[3], arr[2]);
             } else {
-                uh.createMatch(arr[2], arr[3]);
+                uh.updateMatch(arr[3], arr[2]);
             }
         }
     }
@@ -95,6 +96,7 @@ public class ClientHandler implements Runnable {
                             {
                                 PlayerOut.get(arr[1]).writeObject(("gamereq " + username));   //envia mensagem ao cliente com que se pretende iniciar o jogo
                                 pedido.put(arr[1], username);
+                                uh.createMatch(username , arr[1]);
                                 PlayerOut.get(arr[1]).flush();
 
                             } else if (arr[0].equals("accept") || tempUser != null)//caso seja a resposta a um pedido de um cliente
