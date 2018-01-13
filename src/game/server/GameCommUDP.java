@@ -36,47 +36,57 @@ public class GameCommUDP {
 
             bOut = new ByteArrayOutputStream();
             out = new ObjectOutputStream(bOut);
+            Thread GameThread = new Thread(new Runnable() {
 
-            out.writeObject(message);
-            out.flush();
+                @Override
+                public void run() {
+                    try {
+                        out.writeObject(message);
+                        out.flush();
 
-            sendPacket = new DatagramPacket(bOut.toByteArray(), bOut.size(), addr, port);
-            System.out.println("UDP Sending packet");
+                        sendPacket = new DatagramPacket(bOut.toByteArray(), bOut.size(), addr, port);
+                        System.out.println("UDP Sending packet");
 
-            socket.send(sendPacket);
-            System.out.print("UDP Waiting for packet.... ");
+                        socket.send(sendPacket);
+                        System.out.print("UDP Waiting for packet.... ");
 
-            byte[] buffer = new byte[BUFSIZE];
-            DatagramPacket receivePacket = new DatagramPacket(buffer, BUFSIZE);
-            boolean timeout = false;
+                        byte[] buffer = new byte[BUFSIZE];
+                        DatagramPacket receivePacket = new DatagramPacket(buffer, BUFSIZE);
+                        boolean timeout = false;
 
-            try {
-                socket.receive(receivePacket);
-            } catch (InterruptedIOException e) {
-                System.out.println("UDP Timeout error " + e);
-                timeout = true;
-            }
-            if (!timeout) {
-                System.out.println("UDP Packet received!");
-                System.out.println("Details : " + receivePacket.getAddress());
+                        try {
+                            socket.receive(receivePacket);
+                        } catch (InterruptedIOException e) {
+                            System.out.println("UDP Timeout error " + e);
+                            timeout = true;
+                        }
+                        if (!timeout) {
+                            System.out.println("UDP Packet received!");
+                            System.out.println("Details : " + receivePacket.getAddress());
 
-                in = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData(), 0, receivePacket.getLength()));
-                String msgs = (String) in.readObject();
+                            in = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData(), 0, receivePacket.getLength()));
+                            String msgs = (String) in.readObject();
 
-                System.out.println(msgs);
-            } else {
-                System.out.println("Nothing recieved... UDP Packet lost!");
-            }
+                            System.out.println(msgs);
+                        } else {
+                            System.out.println("Nothing recieved... UDP Packet lost!");
+                        }
 
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException e) {
-                System.out.println("UDP Interrupted thread " + e);
-            }
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            System.out.println("UDP Interrupted thread " + e);
+                        }
+                    } catch (ClassNotFoundException ex) {
+                        System.out.println("UDP Class not found error " + ex);
+                    } catch (IOException e) {
+                        System.out.println("UDP IoException error " + e);
+                    }
+                }
+
+            });
         } catch (IOException e) {
             System.out.println("UDP IoException error " + e);
-        } catch (ClassNotFoundException ex) {
-            System.out.println("UDP Class not found error " + ex);
         }
 
     }
