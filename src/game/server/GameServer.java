@@ -53,7 +53,7 @@ public class GameServer implements Runnable {
 
             if (pairs != null) {
                 for (Pair p : pairs) {
-                    System.out.println("leu um par");
+
                     try {
                         server = new GameLauncher(ipAndPort, p);
                         server.start();
@@ -63,6 +63,8 @@ public class GameServer implements Runnable {
                         System.out.println("GameServer main run() ClassNotFoundException" + ex);
                     }
                 }
+            } else {
+                System.out.println("GameServer: No pair in creation");
             }
             try {
                 Thread.sleep(5 * 1000);

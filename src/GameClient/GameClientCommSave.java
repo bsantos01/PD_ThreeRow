@@ -77,9 +77,7 @@ public final class GameClientCommSave implements Runnable {
             if (socket != null) {
                 socket.close();
             }
-            if (clientServer != null) {
-                clientServer.close();
-            }
+
             stop = true;
             Thread.sleep(2000);
             game.closeGui();

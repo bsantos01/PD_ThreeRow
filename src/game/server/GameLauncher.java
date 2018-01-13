@@ -71,7 +71,7 @@ public class GameLauncher {
             println("GameServer Running");
             startTCPGameServer();
 
-//            database.setInGame(pair.getId());
+            database.setInGame(pair.getId());
 //            database.setOcuppied(user1);
 //            database.setOcuppied(user2);
             tcpManagerThread.join();
@@ -102,7 +102,12 @@ public class GameLauncher {
 //        database.setInterrupted(pair.getId());
 //        database.setOcuppied(user1);
 //        database.setOcuppied(user2);
-        tcpManagerThread.interrupt();
+        try {
+            tcpManagerThread.interrupt();
+        } catch (Exception e) {
+            System.out.println("stopTCp in Gamelauncher" + e);
+        }
+
         println("GameServer: Stopped");
     }
 
