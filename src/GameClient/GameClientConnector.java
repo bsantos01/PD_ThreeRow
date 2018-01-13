@@ -18,9 +18,9 @@ public final class GameClientConnector implements Runnable {
 
     String player = null;
 
-    public GameClientConnector(String servicePort, String username) throws IOException {
+    public GameClientConnector(int servicePort, String username) throws IOException {
         this.player = username;
-        this.servicePort = Integer.parseInt(servicePort);
+        this.servicePort = servicePort;
         clientServer = new ServerSocket(this.servicePort);
         System.out.println("ServerSocket started @Port " + clientServer.getLocalPort() + " ");
     }

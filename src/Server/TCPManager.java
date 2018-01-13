@@ -95,7 +95,8 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
                                     out.flush();
                                 } else {
                                     if (arr[0].equalsIgnoreCase("Login")) {
-                                        if (uh.login(arr[1], arr[2], nextClient.getInetAddress(), nextClient.getPort())) {
+                                        String ip =nextClient.getInetAddress().toString().substring(1);
+                                        if (uh.login(arr[1], arr[2], ip, nextClient.getPort())) {
                                             out.writeObject(arr[1]+" sucefully logged in.");
                                             control = 1;
                                         } else {

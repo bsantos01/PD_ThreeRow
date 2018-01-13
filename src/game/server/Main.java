@@ -14,11 +14,11 @@ public class Main {
         GameLauncher server;
         GameDBHandler database = new GameDBHandler(ipAndPort);
         List<Pair> pairs = new ArrayList<>();
-
-        try {
-            pairs = database.getPairs();
-        } catch (SQLException ex) {
-            System.err.println("Game Server SQLException - DB " + ex);
+       // while (true) {
+            try {
+                pairs = database.getPairs();
+            } catch (SQLException ex) {
+                System.err.println("Game Server SQLException - DB " + ex);
 
 //            //testing purposes
 //            try {
@@ -30,9 +30,10 @@ public class Main {
 //            } catch (UnknownHostException e) {
 //                System.err.println("Game Main Error - InetAdress " + e);
 //            }
-        }
+            }
 
-        for (Pair p : pairs) {
+            for (Pair p : pairs) {
+                System.out.println("leu um par");
 //            try {
 //                InetAddress addr1 = InetAddress.getByName(database.getIPbyUsername(p.getUser1()));
 //                String port1 = database.getPortbyUsername(p.getUser1());
@@ -40,15 +41,16 @@ public class Main {
 //                InetAddress addr2 = InetAddress.getByName(database.getIPbyUsername(p.getUser2()));
 //                String port2 = database.getPortbyUsername(p.getUser2());
 
-            server = new GameLauncher(ipAndPort, p);
-            server.start();
+                server = new GameLauncher(ipAndPort, p);
+                server.start();
 
 //            } catch (SQLException ex) {
 //                System.err.println("Game Server SQLException Error - InetAdress");
 //            } catch (UnknownHostException ex) {
 //                System.err.println("Game Server Main Error - InetAdress");
 //            }
-        }
+            }
+        //}
 
     }
 

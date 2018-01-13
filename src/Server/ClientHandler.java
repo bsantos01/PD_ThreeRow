@@ -112,6 +112,9 @@ public class ClientHandler implements Runnable {
                             {
                                if(uh.cancelMatch(username, arr[1])==1) 
                                PlayerOut.get(arr[1]).writeObject("O jogador "+username+" cancelou a partida consigo.");
+                            }else if (arr[0].equals("port"))//caso seja o pedido de lista
+                            {
+                               uh.updateClientPort(arr[1], arr[2]);
                             }else if (arr[0].equals("msgto"))//caso seja o pedido de lista
                             {
                                 PlayerOut.get(arr[1]).writeObject(temp);

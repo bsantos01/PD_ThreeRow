@@ -42,7 +42,7 @@ public class DBhandler {
         this.ipAndPort = ip;
     }
 
-    public boolean login(String name, String Pass, InetAddress ip, int port) throws SQLException {
+    public boolean login(String name, String Pass, String ip, int port) throws SQLException {
 
         connect();
 
@@ -367,6 +367,16 @@ public class DBhandler {
         try {
             connect();
             myStmt.executeUpdate("UPDATE pairs SET status='inCreation' where user1='" + string + "' AND user2='" + string0 + "';");
+            close();
+        } catch (SQLException ex) {
+            Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    void updateClientPort(String string, String string0) {
+        try {
+            connect();
+            myStmt.executeUpdate("UPDATE Client SET port='" + string0 + "' where username= '" + string + "';");
             close();
         } catch (SQLException ex) {
             Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);

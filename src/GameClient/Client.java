@@ -3,6 +3,7 @@ package GameClient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.List;
@@ -22,6 +23,7 @@ public final class Client {
     ObjectInputStream in;
     ObjectOutputStream out;
     Scanner sc;
+    String username;
 
     public Client(String ServerAddr, String servicePort) {
         this.ServerAddr = ServerAddr;
@@ -30,9 +32,20 @@ public final class Client {
 
     }
 
+    private Integer findRandomOpenPort() {
+        try (
+                ServerSocket socket = new ServerSocket(0);) {
+            return socket.getLocalPort();
+
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+    }
+
     public void login() {
         String msg;
-        String[] arr;
+        String[] arr = null;
         System.out.println("LOGIN PAGE");
         System.out.println("please use comand ->login username password");
         System.out.println("please use comand ->register username password");
@@ -46,16 +59,26 @@ public final class Client {
 
                 msg = (String) temp;
                 arr = msg.split("[\\W]");
-            } while (!arr[1].equals("Sucefully"));
-            GameClientConnector c1 = new GameClientConnector(Integer.toString(ToServer.getPort()), arr[0]); //username
+            } while (!arr[1].equals("sucefully"));
+
+        } catch (Exception e) {
+            System.out.println("Client: Error during login.");
+        }
+        username = arr[0];
+        int freePort = findRandomOpenPort();
+        GameClientConnector c1;
+        try {
+            out.writeObject(("port " + username + " "+freePort));//escrever para o servidor de gestão actualizar a base de dados com a porta
+
+            c1 = new GameClientConnector(freePort, username); //username
             Thread cl1 = new Thread(c1);
             cl1.setDaemon(true);
             cl1.start();
-           // cl1.join();
-            
-        } catch (Exception e) {
-            System.out.println("Error during login.");
+            //cl1.join();
+        } catch (IOException ex) {
+            Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
         }
+
         commThread.start();
         ScListener();
 
@@ -63,20 +86,19 @@ public final class Client {
 
     public void ScListener() {
 
-        String[] arr = null ;
+        String[] arr = null;
         while (true) {
             try {
                 System.out.println("Execute Comando");
                 Object temp = (String) sc.nextLine();
                 if (temp != null) {
-                            String msg = (String) temp;
+                    String msg = (String) temp;
 
-                            arr = msg.split("[\\W]");
+                    arr = msg.split("[\\W]");
                 }
-                if (arr[0].equals("help")){
+                if (arr[0].equals("help")) {
                     ShowHelp();
-                }
-                else{
+                } else {
                     out.writeObject(temp);
                 }
             } catch (IOException ex) {
