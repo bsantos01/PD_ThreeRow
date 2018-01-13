@@ -95,13 +95,13 @@ public final class GameClientConnector implements Runnable {
                             }
 
                             if (game != null) {
-
-                                while (game.getGame().getCurrentPlayerName().equals(player) && !game.getGame().isOver()) {
-                                    Thread.sleep(10);
+                                
+                                while (game.getGame().getCurrentPlayerName().equals(player) && !game.getGame().isOver()){
+                                    Thread.sleep(2);
                                     //do nothing
                                     //sleep
                                 }
-
+                                
                                 if (!lock || player.equals(game.getGame().getPlayer1().getName())) {
                                     out.writeObject(game.getGame());
                                     out.flush();
@@ -110,7 +110,7 @@ public final class GameClientConnector implements Runnable {
                                     lock = false;
                                     System.err.println("GameClientConnector: Player 2 unlocked");
                                 }
-                                System.out.println("After do nothing...");
+                               
 
                             }
                             //

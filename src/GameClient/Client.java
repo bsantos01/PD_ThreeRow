@@ -1,4 +1,4 @@
-package Client;
+package GameClient;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -46,8 +46,13 @@ public final class Client {
 
                 msg = (String) temp;
                 arr = msg.split("[\\W]");
-            } while (!arr[0].equals("Sucefully"));
-            System.out.println("teste: " + arr[0]);
+            } while (!arr[1].equals("Sucefully"));
+            GameClientConnector c1 = new GameClientConnector(Integer.toString(ToServer.getPort()), arr[0]); //username
+            Thread cl1 = new Thread(c1);
+            cl1.setDaemon(true);
+            cl1.start();
+           // cl1.join();
+            
         } catch (Exception e) {
             System.out.println("Error during login.");
         }

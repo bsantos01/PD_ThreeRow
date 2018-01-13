@@ -1,5 +1,6 @@
 package Client;
 
+import GameClient.Client;
 import java.io.IOException;
 
 /**

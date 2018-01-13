@@ -20,16 +20,16 @@ public class Main {
         } catch (SQLException ex) {
             System.err.println("Game Server SQLException - DB " + ex);
 
-            //testing purposes
-            try {
-                //Miguel
-                //192.168.1.2
-                server = new GameLauncher(InetAddress.getByName("localhost"), "7777", InetAddress.getByName("localhost"), "8888");
-                server.start();
-
-            } catch (UnknownHostException e) {
-                System.err.println("Game Main Error - InetAdress " + e);
-            }
+//            //testing purposes
+//            try {
+//                //Miguel
+//                //192.168.1.2
+//                server = new GameLauncher(InetAddress.getByName("localhost"), "7777", InetAddress.getByName("localhost"), "8888");
+//                server.start();
+//
+//            } catch (UnknownHostException e) {
+//                System.err.println("Game Main Error - InetAdress " + e);
+//            }
         }
 
         for (Pair p : pairs) {
