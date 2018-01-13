@@ -62,22 +62,21 @@ public final class GameClientConnector implements Runnable {
 
                                 } else if (obj.equals("GAMEOVER")) {
                                     System.out.println("GameClientConnector: GAMEOVER arrived...");
-                                    out.writeObject("CLOSING");
+                                  
                                     out.close();
                                     in.close();
                                     if (socket != null) {
                                         socket.close();
                                     }
-                                    if (clientServer != null) {
-                                        clientServer.close();
-                                    }
+
                                     stop = true;
                                     Thread.sleep(2000);
                                     game.closeGui();
                                     Thread.sleep(2000);
                                     game.closePop();
-
                                     
+                                    Thread.currentThread().interrupt();
+                                    return;
                                 } else {
                                     System.out.println("GameClientConnector: An unexpected string arrived..." + obj + "");
                                 }
