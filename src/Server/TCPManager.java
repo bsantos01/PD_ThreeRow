@@ -87,7 +87,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
 
                                 if (arr[0].equalsIgnoreCase("Register")) {
                                     if (uh.register(arr[1], arr[2])) {
-                                        out.writeObject("Sucefully registered, player " + arr[1] + ".");
+                                        out.writeObject(arr[1] +" sucefully registered.");
                                         control = 1;
                                     } else {
                                         out.writeObject("Impossible to register.");
@@ -96,7 +96,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
                                 } else {
                                     if (arr[0].equalsIgnoreCase("Login")) {
                                         if (uh.login(arr[1], arr[2], nextClient.getInetAddress(), nextClient.getPort())) {
-                                            out.writeObject("Sucefully logged in, player " + arr[1] + ".");
+                                            out.writeObject(arr[1]+" sucefully logged in.");
                                             control = 1;
                                         } else {
                                             out.writeObject("Faulty login");

@@ -59,7 +59,7 @@ public class ClientHandler implements Runnable {
 
     public void addNewClient(String username, Socket ToClient, ObjectInputStream in, ObjectOutputStream out) throws IOException {
 
-        System.out.println("vou tentar addiconar a tread do " + username);
+ 
         for (Map.Entry<String, Thread> entry : PlayerThread.entrySet()) {
             System.out.println(entry.getKey());
 
