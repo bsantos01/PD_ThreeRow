@@ -39,6 +39,8 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         this.pairs = new ArrayList<>();
         this.users = new ArrayList<>();
         this.oldGames = new ArrayList<>();
+
+        this.database = new DBhandler(ip);
     }
 
     public void notifyObservers() throws RemoteException {
@@ -95,12 +97,21 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
 
     @Override
     public List<String> getUsers() throws RemoteException {
-        users.add("String getUsers RMISERVICE"); //temp
 
         try {
-            users.addAll(database.getUsersLogged());
+            if (database == null) {
+                System.out.println("é esta merda!!!!");
+            }
+            if (database.getUsersLogged() != null) {
+                users.addAll(database.getUsersLogged());
+            } else {
+                users.add("No users are On!");
+            }
         } catch (SQLException ex) {
             System.out.println("RMIService: SQLException " + ex);
+        } catch (Exception ex) {
+            System.out.println("RMIService: Exception " + ex);
+            //users.add("No users are On!");
         }
         return users;
 

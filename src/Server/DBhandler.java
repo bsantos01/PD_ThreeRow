@@ -77,17 +77,19 @@ public class DBhandler {
 
     public List<String> getUsersLogged() throws SQLException {
         List<String> list = new ArrayList<String>();
+        System.out.println("1");
         connect();
-        rs = myStmt.executeQuery("SELECT username, free FROM Client WHERE active=TRUE;");
-
+        System.out.println("2");
+        rs = myStmt.executeQuery("SELECT username FROM Client;");
+        System.out.println("3");
         if (rs.next() == false) {
             System.out.println("No free players.");
             return null;
         } else {
-
+            System.out.println("4");
             do {
-                list.add(rs.getString("username") + " is free:" + rs.getBoolean("free"));
-                System.out.println("DB: " + rs.getString("username") + " is free:" + rs.getBoolean("free"));
+                list.add(rs.getString("username"));
+                System.out.println("DB: " + rs.getString("username"));
             } while (rs.next());
         }
         close();

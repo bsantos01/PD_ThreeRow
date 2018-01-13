@@ -14,7 +14,7 @@ import java.rmi.RemoteException;
 public class main {
 
     public static void main(String[] args) throws RemoteException {
-        RMIClient client = new RMIClient();
+        RMIClient client = new RMIClient("localhost");
         client.run();
     }
 

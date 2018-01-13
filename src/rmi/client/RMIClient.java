@@ -5,6 +5,8 @@ import java.rmi.NotBoundException;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
 import rmi.commons.RemoteServiceInterface;
 import rmi.commons.ServerMonitorListener;
 
@@ -13,10 +15,9 @@ public class RMIClient extends UnicastRemoteObject implements ServerMonitorListe
     private String addr;
 
     RemoteServiceInterface rmiService;
-    String output = "Printing servers";
 
-    public RMIClient() throws RemoteException {
-        this.addr = "localhost";
+    public RMIClient(String string) throws RemoteException {
+        this.addr = string;
 
     }
 
@@ -24,9 +25,9 @@ public class RMIClient extends UnicastRemoteObject implements ServerMonitorListe
     public void run() {
         try {
             String registration = "rmi://" + addr + "/PD";
+
             Remote remoteService = Naming.lookup(registration);
             rmiService = (RemoteServiceInterface) remoteService;
-
             rmiService.addObserver(this);
 
         } catch (NotBoundException e) {
@@ -38,18 +39,27 @@ public class RMIClient extends UnicastRemoteObject implements ServerMonitorListe
         }
     }
 
-    public RemoteServiceInterface getService() {
-        return rmiService;
+    @Override
+    public void printPairs() throws RemoteException {
+
+        try {
+            List<String> users = new ArrayList<>();
+            users.add("uno uno uno");
+
+            if (rmiService.getUsers() != null) {
+                users.addAll(rmiService.getUsers());
+            }
+
+            for (String str : users) {
+                System.err.println("Monitor: " + str);
+            }
+        } catch (Exception e) {
+            System.out.println("rmi.client.RMIClient.printPairs() " + e);
+        }
     }
 
     public void terminate() throws RemoteException {
         rmiService.removeObserver(this);
-    }
-
-    @Override
-    public void printPairs() throws RemoteException {
-        System.out.println("pairs");
-
     }
 
 }

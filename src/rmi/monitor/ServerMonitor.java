@@ -35,6 +35,7 @@ public class ServerMonitor extends UnicastRemoteObject implements ServerMonitorL
             Remote remoteService = Naming.lookup(registration);
             serverMonitor = (RemoteServiceInterface) remoteService;
             serverMonitor.addObserver(observer);
+
         } catch (NotBoundException e) {
             System.out.println("Não existe servico disponivel! ");
         } catch (RemoteException e) {
@@ -48,6 +49,7 @@ public class ServerMonitor extends UnicastRemoteObject implements ServerMonitorL
     public void printPairs() throws RemoteException {
 
         List<String> users = new ArrayList<>();
+        users.add("uno uno uno");
 
         users = serverMonitor.getUsers();
 
