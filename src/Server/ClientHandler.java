@@ -142,9 +142,21 @@ public class ClientHandler implements Runnable {
                     } catch (ClassNotFoundException ex) {
 
                     } catch (SocketException e) {
-                        System.out.println(">>>SocketFechado");
-
-                        return;
+                        try {
+                            uh.logout(username);
+                            PlayerIn.get(username).close();
+                            PlayerIn.remove(username);
+                            PlayerOut.get(username).close();
+                            PlayerOut.remove(username);
+                            PlayerSocket.get(username).close();
+                            PlayerSocket.remove(username);
+                            
+                            System.out.println(">>>SocketFechado");
+                            
+                            return;
+                        } catch (IOException ex) {
+                            Logger.getLogger(ClientHandler.class.getName()).log(Level.SEVERE, null, ex);
+                        }
                     } catch (IOException ex) {
 
                     } catch (SQLException ex) {

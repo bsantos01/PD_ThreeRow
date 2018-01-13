@@ -273,7 +273,7 @@ public class DBhandler {
     void logout(String string) {
         try {
             connect();
-            myStmt.executeUpdate("UPDATE Client where username= " + string + " SET active=false, ip='', port='' ;");
+            myStmt.executeUpdate("UPDATE Client SET active=false, ip='', port='' where username= '" + string + "';");
             close();
         } catch (SQLException ex) {
             Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
