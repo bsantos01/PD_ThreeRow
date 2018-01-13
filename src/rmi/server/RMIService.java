@@ -5,10 +5,12 @@
  */
 package rmi.server;
 
+import Server.DBhandler;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import rmi.commons.RemoteServiceInterface;
@@ -21,11 +23,22 @@ import rmi.commons.ServerMonitorListener;
 public class RMIService extends UnicastRemoteObject implements RemoteServiceInterface, Runnable {
 
     private static ArrayList<ServerMonitorListener> observers;
+
     private String ipAndPort = "";
+    private DBhandler database;
+
+    private List<String> pairs;
+    private List<String> users;
+    private List<String> oldGames;
 
     public RMIService(String ip) throws RemoteException {
         this.observers = new ArrayList<ServerMonitorListener>();
+
         this.ipAndPort = ip;
+
+        this.pairs = new ArrayList<>();
+        this.users = new ArrayList<>();
+        this.oldGames = new ArrayList<>();
     }
 
     public void notifyObservers() throws RemoteException {
@@ -46,7 +59,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
                 System.out.println("RMIService working @ port: " + Registry.REGISTRY_PORT);
                 r = LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
 
-                System.out.println("RMIService started!");
+                System.out.println("RMIService starting...");
 
             } catch (RemoteException e) {
                 System.out.println("RMIService already executing!");
@@ -56,7 +69,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
             RMIService directoryService = new RMIService(ipAndPort);
             r.bind("PD", directoryService);
 
-            System.out.println("RMIService started...");
+            System.out.println("RMIService started!");
 
         } catch (RemoteException e) {
             System.out.println("RMIService RemoteException " + e);
@@ -82,9 +95,15 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
 
     @Override
     public List<String> getUsers() throws RemoteException {
-        List<String> list = new ArrayList<>();
-        list.add("String Server RMISERVICE");
-        return list;
+        users.add("String getUsers RMISERVICE"); //temp
+
+        try {
+            users.addAll(database.getUsersLogged());
+        } catch (SQLException ex) {
+            System.out.println("RMIService: SQLException " + ex);
+        }
+        return users;
+
     }
 
     @Override

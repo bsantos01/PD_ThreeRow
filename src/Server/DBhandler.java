@@ -75,6 +75,26 @@ public class DBhandler {
         return FPlist;
     }
 
+    public List<String> getUsersLogged() throws SQLException {
+        List<String> list = new ArrayList<String>();
+        connect();
+        rs = myStmt.executeQuery("SELECT username, free FROM Client WHERE active=TRUE;");
+
+        if (rs.next() == false) {
+            System.out.println("No free players.");
+            return null;
+        } else {
+
+            do {
+                list.add(rs.getString("username") + " is free:" + rs.getBoolean("free"));
+                System.out.println("DB: " + rs.getString("username") + " is free:" + rs.getBoolean("free"));
+            } while (rs.next());
+        }
+        close();
+        return list;
+    }
+    //AND ingame=false AND free=true
+
     public String getPortbyUsername(String username) throws SQLException {
         String ret;
         connect();

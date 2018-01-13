@@ -91,7 +91,7 @@ public class TableCreation {
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 
             //Status:
-            //???request
+            //onRequest
             //inCreation
             //inGame
             //finished
