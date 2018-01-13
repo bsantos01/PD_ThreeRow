@@ -3,6 +3,8 @@ package Server;
 import java.io.*;
 import java.net.*;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class HeartbeatServer
 {
@@ -13,13 +15,15 @@ public class HeartbeatServer
     private DatagramSocket socket;
     private DatagramPacket packet; 
     private boolean debug;
+    private String dbAdress;
 
-    public HeartbeatServer(int listeningPort, boolean debug) throws SocketException
+    public HeartbeatServer(int listeningPort, boolean debug, String dbAdress) throws SocketException
     {
         socket = null;
         packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
         socket = new DatagramSocket(listeningPort);
         this.debug = debug;
+        this.dbAdress=dbAdress;
     }
 
     public String waitDatagram() throws IOException
@@ -54,10 +58,23 @@ public class HeartbeatServer
 
     }
     
+    public void start() {
+        Thread HeartbeatThread = new Thread(new Runnable() {
+
+                @Override
+                public void run() {
+                    processRequests();
+                }
+
+            });
+        HeartbeatThread.start();
+        
+
+    }
+    
     public void processRequests()
     {
         String receivedMsg;
-        Calendar calendar;
         ByteArrayOutputStream bOut;
         ObjectOutputStream out;
 
@@ -71,7 +88,8 @@ public class HeartbeatServer
             System.out.println("UDP Serialized Time Server iniciado...");
         }
 
-        while (true)
+        int goOut=0;
+        while (goOut<3)
         {
 
             try
@@ -79,43 +97,47 @@ public class HeartbeatServer
 
                 receivedMsg = waitDatagram();
 
-                if (receivedMsg == null)
+                /*if (receivedMsg == null)
                 {
+                    goOut++;
                     continue;
-                }
+                }*/
 
                 if (!receivedMsg.equalsIgnoreCase(TIME_REQUEST))
                 {
+                    goOut++;
                     continue;
                 }
-
+                else{
+                    goOut=0;
+                }
                 bOut = new ByteArrayOutputStream(MAX_SIZE);
                 out = new ObjectOutputStream(bOut);
 
-                out.writeObject("Database Adress");
+                out.writeObject(dbAdress);
                 packet.setData(bOut.toByteArray());
                 packet.setLength(bOut.size());
 
                 System.out.println("Answer size: " + bOut.size());
                 socket.send(packet);
-
+                Thread.sleep(10*1000);
             } catch (IOException e)
             {
                 System.out.println(e);
+            } catch (InterruptedException ex) {
+                System.out.println(ex);
             }
-
         }
 
     }
 
-    public void closeSocket()
-    {
-        if (socket != null)
-        {
-            socket.close();
-        }
-    }
-
+//    public void closeSocket()
+//    {
+//        if (socket != null)
+//        {
+//            socket.close();
+//        }
+//    }
 //    public static void main(String[] args)
 //    {
 //        int listeningPort;
