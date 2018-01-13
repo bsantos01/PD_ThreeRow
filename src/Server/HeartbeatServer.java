@@ -12,6 +12,12 @@ public class HeartbeatServer {
     private DatagramPacket packet;
     private String dbAdress;
 
+    private String receivedMsg;
+    private ByteArrayOutputStream bOut;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+    private String request;
+
     public HeartbeatServer(int listeningPort, String dbAdress) throws SocketException {
         socket = null;
         packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
@@ -20,8 +26,6 @@ public class HeartbeatServer {
     }
 
     public String waitDatagram() throws IOException {
-        String request;
-        ObjectInputStream in;
 
         if (socket == null) {
             return null;
@@ -55,9 +59,6 @@ public class HeartbeatServer {
     }
 
     public void processRequests() {
-        String receivedMsg;
-        ByteArrayOutputStream bOut;
-        ObjectOutputStream out;
 
         if (socket == null) {
             return;
@@ -69,10 +70,6 @@ public class HeartbeatServer {
             try {
 
                 receivedMsg = waitDatagram();
-
-                /*
-                 * if (receivedMsg == null) { goOut++; continue; }
-                 */
                 if (!receivedMsg.equalsIgnoreCase(TIME_REQUEST)) {
                     goOut++;
                     continue;
@@ -98,13 +95,27 @@ public class HeartbeatServer {
 
     }
 
-//    public void closeSocket()
-//    {
-//        if (socket != null)
-//        {
-//            socket.close();
-//        }
-//    }
+    public void interrupt() {
+        try {
+
+            if (in != null) {
+                in.close();
+            }
+            if (bOut != null) {
+                bOut.close();
+            }
+            if (out != null) {
+                out.close();
+            }
+
+            if (socket != null) {
+                socket.close();
+            }
+        } catch (IOException ex) {
+            System.err.println("Heartbeat server: IOException closing..." + ex);
+        }
+    }
+
 //    public static void main(String[] args)
 //    {
 //        int listeningPort;

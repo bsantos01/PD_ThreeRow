@@ -3,13 +3,7 @@ package Server;
 import java.io.IOException;
 import java.net.SocketException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
-/**
- *
- * @author Bruno Santos
- */
 public class Server {
 
     private String serverName;
@@ -20,6 +14,7 @@ public class Server {
     private final int servicePort;
     private Thread inputListenerThread;
     private InputListener inputListener;
+    private HeartbeatServer hb;
 
     public Server(String serverName, String serviceAddress, int servicePort) {
         this.serverName = serverName;
@@ -79,7 +74,7 @@ public class Server {
         try {
             tcpManager.killPlayers();
         } catch (SQLException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("Server: SQLException stopTCPManager(): " + ex);
         }
         tcpManagerThread.interrupt();
 
@@ -111,7 +106,7 @@ public class Server {
         }
 
         stopInputListener();
-        //stopUDPManager();
+        stopHeartbeat();
         stopTCPManager();
 
         println("Exiting");
@@ -125,12 +120,19 @@ public class Server {
         try {
             println("Starting heartbeat . . . ");
 
-            HeartbeatServer hb = new HeartbeatServer(6999, "localhost:3306");
+            hb = new HeartbeatServer(6999, "localhost:3306");
             hb.start();
 
             println("OK");
         } catch (SocketException ex) {
             System.out.println("Server.starHeartbeat()");
         }
+    }
+
+    private void stopHeartbeat() {
+
+        println("Closing heartbeat . . . ");
+        //hb.interrupt();
+
     }
 }
