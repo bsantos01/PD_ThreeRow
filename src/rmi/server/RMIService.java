@@ -44,11 +44,11 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
     }
 
     public void notifyObservers() throws RemoteException {
-        //System.out.println("Observadores: " + observers.size());
         for (ServerMonitorListener observer : observers) {
-            //if (observer.wait())
             if (observer != null) {
                 observer.printPairs();
+                observer.printUsers();
+                observer.printHistory();
             }
         }
     }
@@ -85,7 +85,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
     @Override
     public void addObserver(ServerMonitorListener observer) throws RemoteException {
         observers.add(observer);
-        notifyObservers();
+        notifyObservers(); //FIND ME
     }
 
     @Override
@@ -120,7 +120,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
             if (database.getPairs() != null) {
                 pairs.addAll(database.getPairs());
             } else {
-                pairs.add("No users are On!");
+                pairs.add("No pairs available!");
             }
         } catch (SQLException ex) {
             System.out.println("RMIService: SQLException " + ex);
@@ -133,10 +133,10 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
     @Override
     public List<String> getOldGames() throws RemoteException {
         try {
-            if (database.getPairs() != null) { //getGames..
+            if (database.getFinishedGames() != null) { //getGames..
                 oldGames.addAll(database.getPairs());
             } else {
-                oldGames.add("No users are On!");
+                oldGames.add("No finished games!");
             }
         } catch (SQLException ex) {
             System.out.println("RMIService: SQLException " + ex);

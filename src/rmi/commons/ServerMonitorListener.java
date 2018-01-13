@@ -10,7 +10,4 @@ public interface ServerMonitorListener extends java.rmi.Remote {
 
     public void printHistory() throws RemoteException;
 
-    //print LoggedUsers
-    //print Pairs //inCreation //inGame
-    //print history
 }

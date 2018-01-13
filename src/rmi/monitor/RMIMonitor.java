@@ -43,18 +43,18 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
     public void printPairs() throws RemoteException {
 
         try {
-            List<String> users = new ArrayList<>();
-            users.add("uno uno uno");
+            List<String> pairs = new ArrayList<>();
+            pairs.add("Pairs on server:");
 
-            if (rmiService.getUsers() != null) {
-                users.addAll(rmiService.getPairs());
+            if (rmiService.getPairs() != null) {
+                pairs.addAll(rmiService.getPairs());
             }
 
-            for (String str : users) {
+            for (String str : pairs) {
                 System.err.println("Monitor: " + str);
             }
         } catch (Exception e) {
-            System.out.println("rmi.client.RMIClient.printPairs() " + e);
+            System.out.println("RmiMonitor: printPairs() " + e);
         }
     }
 
@@ -72,17 +72,30 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
                 System.err.println("Monitor: " + str);
             }
         } catch (Exception e) {
-            System.out.println("rmi.client.RMIClient.printPairs() " + e);
+            System.out.println("RmiMonitor: printUsers() " + e);
+        }
+    }
+
+    @Override
+    public void printHistory() throws RemoteException {
+        try {
+            List<String> historic = new ArrayList<>();
+            historic.add("Old Games:");
+
+            if (rmiService.getOldGames() != null) {
+                historic.addAll(rmiService.getUsers());
+            }
+
+            for (String str : historic) {
+                System.err.println("Monitor: " + str);
+            }
+        } catch (Exception e) {
+            System.out.println("RmiMonitor: printHistory " + e);
         }
     }
 
     public void terminate() throws RemoteException {
         rmiService.removeObserver(this);
-    }
-
-    @Override
-    public void printHistory() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

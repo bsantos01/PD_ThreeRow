@@ -68,28 +68,28 @@ public class DBhandler {
         } else {
 
             do {
-                FPlist.add((rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("winner")));
+                FPlist.add((rs.getString("user1") + " VS " + rs.getString("user2") + " - " + rs.getString("winner")));
             } while (rs.next());
         }
         close();
         return FPlist;
     }
-    
+
     public List<String> GetHistory(String user) throws SQLException {
         List<String> FPlist = new ArrayList<String>();
         connect();
-        rs = myStmt.executeQuery("SELECT user1, user2, status, winner FROM pairs WHERE user1='"+user+"';");
-        while (rs.next()){
-            FPlist.add(rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("status") +" winner: "+rs.getString("winner"));
+        rs = myStmt.executeQuery("SELECT user1, user2, status, winner FROM pairs WHERE user1='" + user + "';");
+        while (rs.next()) {
+            FPlist.add(rs.getString("user1") + " VS " + rs.getString("user2") + " - " + rs.getString("status") + " winner: " + rs.getString("winner"));
         }
-        rs = myStmt.executeQuery("SELECT user1, user2, status, winner FROM pairs WHERE user2='"+user+"';");
-        while (rs.next()){
-            FPlist.add((rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("winner")));
+        rs = myStmt.executeQuery("SELECT user1, user2, status, winner FROM pairs WHERE user2='" + user + "';");
+        while (rs.next()) {
+            FPlist.add((rs.getString("user1") + " VS " + rs.getString("user2") + " - " + rs.getString("winner")));
         }
         close();
         return FPlist;
     }
-    
+
     public List<String> getUnfinishedGames() throws SQLException {
         List<String> FPlist = new ArrayList<String>();
         connect();
@@ -101,13 +101,13 @@ public class DBhandler {
         } else {
 
             do {
-                FPlist.add((rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("winner")));
+                FPlist.add((rs.getString("user1") + " VS " + rs.getString("user2") + " - " + rs.getString("winner")));
             } while (rs.next());
         }
         close();
         return FPlist;
     }
-    
+
     public List<String> getFreePlayers() throws SQLException {
         List<String> FPlist = new ArrayList<String>();
         connect();
@@ -148,7 +148,7 @@ public class DBhandler {
         List<String> list = new ArrayList<String>();
         connect();
 
-        rs = myStmt.executeQuery("SELECT user1, user2, status FROM Pairs WHERE status=inCreation and status=inRequest;");
+        rs = myStmt.executeQuery("SELECT user1, user2, status FROM Pairs WHERE status='inCreation' and status='inRequest';");
         if (rs.next() == false) {
             System.out.println("No free players.");
             return null;
@@ -334,45 +334,43 @@ public class DBhandler {
     void deleteMatch(String string, String string0) {
         try {
             connect();
-            myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='"+ string0 +"' AND status='inRequest';");
+            myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='" + string0 + "' AND status='inRequest';");
             close();
         } catch (SQLException ex) {
             Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    int cancelMatch(String string, String string0){
+
+    int cancelMatch(String string, String string0) {
         connect();
-        int i=0;
+        int i = 0;
         try {
-            
-            i =myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='"+ string0 +"' AND status='inCreation';");
-            System.out.println("variavel retorna "+i);
-            if(i==0)
-               i= myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string0 + "' AND user2='"+ string +"' AND status='inCreation';");
-           System.out.println("variavel depois retorna "+i);
-                   close();
-           
+
+            i = myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='" + string0 + "' AND status='inCreation';");
+            System.out.println("variavel retorna " + i);
+            if (i == 0) {
+                i = myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string0 + "' AND user2='" + string + "' AND status='inCreation';");
+            }
+            System.out.println("variavel depois retorna " + i);
+            close();
+
         } catch (SQLException ex) {
-                System.out.println("Tentativa de eliminar um registo inexistente.");
+            System.out.println("Tentativa de eliminar um registo inexistente.");
         }
-        
-           
+
         this.freePlayer(string);
         this.freePlayer(string0);
-        return i; 
+        return i;
     }
 
     void updateMatch(String string, String string0) {
-         try {
+        try {
             connect();
-            myStmt.executeUpdate("UPDATE pairs SET status='inCreation' where user1='" + string + "' AND user2='"+ string0 +"';");
+            myStmt.executeUpdate("UPDATE pairs SET status='inCreation' where user1='" + string + "' AND user2='" + string0 + "';");
             close();
         } catch (SQLException ex) {
             Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    
-    
+
 }
