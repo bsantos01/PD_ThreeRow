@@ -5,7 +5,6 @@
  */
 package Server;
 
-import java.net.InetAddress;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -148,7 +147,7 @@ public class DBhandler {
         List<String> list = new ArrayList<String>();
         connect();
 
-        rs = myStmt.executeQuery("SELECT user1, user2, status FROM Pairs WHERE status='inCreation' and status='inRequest';");
+        rs = myStmt.executeQuery("SELECT user1, user2, status FROM Pairs WHERE status='inCreation';");
         if (rs.next() == false) {
             System.out.println("No pairs available.");
             return null;

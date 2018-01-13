@@ -2,7 +2,9 @@ package Server;
 
 import java.io.IOException;
 import java.net.SocketException;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
+import rmi.server.RMIService;
 
 public class Server {
 
@@ -34,9 +36,16 @@ public class Server {
             println("Running");
 
             startTCPManager();
-
             startHeartbeat();
             startInputListener();
+
+            try {
+                RMIService rmiService = new RMIService("localhost:3306");
+                rmiService.run();
+
+            } catch (RemoteException ex) {
+                System.out.println("Erro ao iniciar o servico RMI! " + ex);
+            }
             //join InputListener (typing "exit" would interrupt it
             //creating a domino effect that would close all other threads including
             //the main one)
@@ -105,10 +114,10 @@ public class Server {
         if (!hasStarted) {
             throw new IllegalStateException("Server is not yet running.");
         }
-        stopHeartbeat();
+        hb.interrupt();
+
         stopInputListener();
         stopTCPManager();
-        
 
         println("Exiting");
     }
@@ -130,10 +139,4 @@ public class Server {
         }
     }
 
-    private void stopHeartbeat() {
-
-        println("Closing heartbeat . . . ");
-        hb.interrupt();
-
-    }
 }

@@ -20,8 +20,8 @@ public class GameLauncher {
     private Pair pair;
 
     //getFromDb, and delete this
-    String user1 = "Bruno";
-    String user2 = "Miguel";
+    String user1 = " ";
+    String user2 = " ";
 
     public GameLauncher(InetAddress serviceAddress, String servicePort, InetAddress serviceAddress2, String servicePort2) {
         this.serviceAddress = serviceAddress;
