@@ -1,4 +1,4 @@
-package rmi.client;
+package rmi.monitor;
 
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -10,13 +10,13 @@ import java.util.List;
 import rmi.commons.RemoteServiceInterface;
 import rmi.commons.ServerMonitorListener;
 
-public class RMIClient extends UnicastRemoteObject implements ServerMonitorListener, Runnable {
+public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorListener, Runnable {
 
     private String addr;
 
     RemoteServiceInterface rmiService;
 
-    public RMIClient(String string) throws RemoteException {
+    public RMIMonitor(String string) throws RemoteException {
         this.addr = string;
 
     }
@@ -78,6 +78,11 @@ public class RMIClient extends UnicastRemoteObject implements ServerMonitorListe
 
     public void terminate() throws RemoteException {
         rmiService.removeObserver(this);
+    }
+
+    @Override
+    public void printHistory() throws RemoteException {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
 }

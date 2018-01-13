@@ -116,12 +116,34 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
 
     @Override
     public List<String> getPairs() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            if (database.getPairs() != null) {
+                pairs.addAll(database.getPairs());
+            } else {
+                pairs.add("No users are On!");
+            }
+        } catch (SQLException ex) {
+            System.out.println("RMIService: SQLException " + ex);
+        } catch (Exception ex) {
+            System.out.println("RMIService: Exception " + ex);
+        }
+        return pairs;
     }
 
     @Override
     public List<String> getOldGames() throws RemoteException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        try {
+            if (database.getPairs() != null) { //getGames..
+                oldGames.addAll(database.getPairs());
+            } else {
+                oldGames.add("No users are On!");
+            }
+        } catch (SQLException ex) {
+            System.out.println("RMIService: SQLException " + ex);
+        } catch (Exception ex) {
+            System.out.println("RMIService: Exception " + ex);
+        }
+        return oldGames;
     }
 
 }
