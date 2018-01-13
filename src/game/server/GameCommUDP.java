@@ -94,8 +94,10 @@ public class GameCommUDP {
     }
 
     public void start() {
-        Thread HeartbeatThread = new Thread(new Runnable() {
+        stop =false;
 
+        Thread HeartbeatThread = new Thread(new Runnable() {
+                
             @Override
             public void run() {
                 while (!stop) {

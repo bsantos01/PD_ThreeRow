@@ -105,10 +105,10 @@ public class Server {
         if (!hasStarted) {
             throw new IllegalStateException("Server is not yet running.");
         }
-
+        stopHeartbeat();
         stopInputListener();
         stopTCPManager();
-        stopHeartbeat();
+        
 
         println("Exiting");
     }

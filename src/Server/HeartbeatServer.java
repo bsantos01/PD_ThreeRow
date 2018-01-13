@@ -18,9 +18,10 @@ public class HeartbeatServer {
     private ObjectInputStream in;
     private String request;
 
-    private boolean exit = false;
+    boolean exit;
 
     public HeartbeatServer(int listeningPort, String dbAdress) throws SocketException {
+        exit = false;
         socket = null;
         packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
         socket = new DatagramSocket(listeningPort);
@@ -32,8 +33,12 @@ public class HeartbeatServer {
         if (socket == null) {
             return null;
         }
-
+        socket.setSoTimeout(5000);
+        
+        if(exit) return "exit"; 
+        System.out.println(exit);
         socket.receive(packet);
+
         in = new ObjectInputStream(new ByteArrayInputStream(packet.getData()));
 
         try {
@@ -74,6 +79,7 @@ public class HeartbeatServer {
             try {
 
                 receivedMsg = waitDatagram();
+                if(exit)return;
                 if (!receivedMsg.equalsIgnoreCase(TIME_REQUEST)) {
                     goOut++;
                     continue;
@@ -89,7 +95,10 @@ public class HeartbeatServer {
 
                 System.out.println("Answer size: " + bOut.size());
                 socket.send(packet);
-                Thread.sleep(5 * 1000);
+                for(int i = 0; i < 10; i++){
+                    Thread.sleep(1000);
+                    if(exit)return;
+                }
             } catch (IOException e) {
                 System.out.println(e);
             } catch (InterruptedException ex) {
@@ -101,6 +110,11 @@ public class HeartbeatServer {
 
     public void interrupt() {
         try {
+            exit = true;
+            //System.out.println("Thread is alive?" + HeartbeatThread.isAlive());
+            //System.out.println(exit);
+
+            HeartbeatThread.interrupt();
 
             if (in != null) {
                 in.close();
@@ -111,10 +125,12 @@ public class HeartbeatServer {
             if (out != null) {
                 out.close();
             }
-            exit = true;
 
-            HeartbeatThread.interrupt();
+            socket.close();
+            
+            
             System.err.println("HeartbeatServer.interrupt()");
+            HeartbeatThread.join();
 
         } catch (IOException ex) {
             System.err.println("Heartbeat server: IOException closing..." + ex);
