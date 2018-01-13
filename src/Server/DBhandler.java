@@ -74,7 +74,41 @@ public class DBhandler {
         close();
         return FPlist;
     }
-        public List<String> getFreePlayers() throws SQLException {
+    
+    public List<String> GetHistory(String user) throws SQLException {
+        List<String> FPlist = new ArrayList<String>();
+        connect();
+        rs = myStmt.executeQuery("SELECT user1, user2, status, winner FROM pairs WHERE user1='"+user+"';");
+        while (rs.next()){
+            FPlist.add(rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("status") +" winner: "+rs.getString("winner"));
+        }
+        rs = myStmt.executeQuery("SELECT user1, user2, status, winner FROM pairs WHERE user2='"+user+"';");
+        while (rs.next()){
+            FPlist.add((rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("winner")));
+        }
+        close();
+        return FPlist;
+    }
+    
+    public List<String> getUnfinishedGames() throws SQLException {
+        List<String> FPlist = new ArrayList<String>();
+        connect();
+        rs = myStmt.executeQuery("SELECT user1, user2, winner FROM pairs WHERE status='interrupted';");
+
+        if (rs.next() == false) {
+            System.out.println("No finished games.");
+            return null;
+        } else {
+
+            do {
+                FPlist.add((rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("winner")));
+            } while (rs.next());
+        }
+        close();
+        return FPlist;
+    }
+    
+    public List<String> getFreePlayers() throws SQLException {
         List<String> FPlist = new ArrayList<String>();
         connect();
         rs = myStmt.executeQuery("SELECT username FROM Client WHERE active=TRUE AND ingame=false AND free=true;");
