@@ -10,11 +10,15 @@ public class GameCommUDP {
     private String clientName;
     private int port;
     private InetAddress addr = null;
+
     private DatagramSocket socket;
     private DatagramPacket sendPacket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
     private ByteArrayOutputStream bOut;
+
+    private String msgs = "";
+    private boolean stop = false;
 
     public GameCommUDP(String clientName, int port) {
         this.clientName = clientName;
@@ -26,17 +30,21 @@ public class GameCommUDP {
         }
     }
 
-    void heartbeat(){
+    public String port() {
+        return msgs;
+    }
+
+    void heartbeat() {
         try {
 
             socket = new DatagramSocket();
-            socket.setSoTimeout(2 * 1000);
+            socket.setSoTimeout(3 * 1000);
 
             String message = "HEARTBEAT";
 
             bOut = new ByteArrayOutputStream();
             out = new ObjectOutputStream(bOut);
-            
+
             try {
                 out.writeObject(message);
                 out.flush();
@@ -62,7 +70,7 @@ public class GameCommUDP {
                     System.out.println("Details : " + receivePacket.getAddress());
 
                     in = new ObjectInputStream(new ByteArrayInputStream(receivePacket.getData(), 0, receivePacket.getLength()));
-                    String msgs = (String) in.readObject();
+                    msgs = (String) in.readObject();
 
                     System.out.println(msgs);
                 } else {
@@ -70,7 +78,7 @@ public class GameCommUDP {
                 }
 
                 try {
-                    Thread.sleep(30*1000);
+                    Thread.sleep(30 * 1000);
                 } catch (InterruptedException e) {
                     System.out.println("UDP Interrupted thread " + e);
                 }
@@ -79,25 +87,29 @@ public class GameCommUDP {
             } catch (IOException e) {
                 System.out.println("UDP IoException error " + e);
             }
-            
-            
+
         } catch (IOException e) {
             System.out.println("UDP IoException error " + e);
         }
     }
-    
+
     public void start() {
         Thread HeartbeatThread = new Thread(new Runnable() {
 
-                @Override
-                public void run() {
+            @Override
+            public void run() {
+                while (!stop) {
                     heartbeat();
                 }
+            }
 
-            });
+        });
         HeartbeatThread.start();
-        
 
+    }
+
+    public void stop() {
+        stop = true;
     }
 
 }

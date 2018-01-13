@@ -70,7 +70,6 @@ public class GameLauncher {
         try {
             println("GameServer Running");
             startTCPGameServer();
-            heartbeatClient();
 
 //            database.setInGame(pair.getId());
 //            database.setOcuppied(user1);
@@ -84,11 +83,6 @@ public class GameLauncher {
         } finally {
             stop();
         }
-    }
-
-    public void heartbeatClient() {
-        GameCommUDP cliente = new GameCommUDP("UDPclient", 6999);
-        cliente.start();
     }
 
     private void startTCPGameServer() throws IOException {

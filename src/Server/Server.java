@@ -1,6 +1,7 @@
 package Server;
 
 import java.io.IOException;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,6 +40,7 @@ public class Server {
 
             startTCPManager();
 
+            starHeartbeat();
             startInputListener();
             //join InputListener (typing "exit" would interrupt it
             //creating a domino effect that would close all other threads including
@@ -117,5 +119,18 @@ public class Server {
 
     public synchronized static void println(Object message) {
         System.out.println(message);
+    }
+
+    private void starHeartbeat() {
+        try {
+            println("Starting heartbeat . . . ");
+
+            HeartbeatServer hb = new HeartbeatServer(6999, "localhost:3306");
+            hb.start();
+
+            println("OK");
+        } catch (SocketException ex) {
+            System.out.println("Server.starHeartbeat()");
+        }
     }
 }

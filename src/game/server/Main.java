@@ -1,10 +1,10 @@
 package game.server;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class Main {
 
@@ -14,11 +14,11 @@ public class Main {
         GameLauncher server;
         GameDBHandler database = new GameDBHandler(ipAndPort);
         List<Pair> pairs = new ArrayList<>();
-       // while (true) {
-            try {
-                pairs = database.getPairs();
-            } catch (SQLException ex) {
-                System.err.println("Game Server SQLException - DB " + ex);
+        // while (true) {
+        try {
+            pairs = database.getPairs();
+        } catch (SQLException ex) {
+            System.err.println("Game Server SQLException - DB " + ex);
 
 //            //testing purposes
 //            try {
@@ -30,10 +30,10 @@ public class Main {
 //            } catch (UnknownHostException e) {
 //                System.err.println("Game Main Error - InetAdress " + e);
 //            }
-            }
+        }
 
-            for (Pair p : pairs) {
-                System.out.println("leu um par");
+        for (Pair p : pairs) {
+            System.out.println("leu um par");
 //            try {
 //                InetAddress addr1 = InetAddress.getByName(database.getIPbyUsername(p.getUser1()));
 //                String port1 = database.getPortbyUsername(p.getUser1());
@@ -41,17 +41,27 @@ public class Main {
 //                InetAddress addr2 = InetAddress.getByName(database.getIPbyUsername(p.getUser2()));
 //                String port2 = database.getPortbyUsername(p.getUser2());
 
-                server = new GameLauncher(ipAndPort, p);
-                server.start();
+            server = new GameLauncher(ipAndPort, p);
+            server.start();
 
 //            } catch (SQLException ex) {
 //                System.err.println("Game Server SQLException Error - InetAdress");
 //            } catch (UnknownHostException ex) {
 //                System.err.println("Game Server Main Error - InetAdress");
 //            }
-            }
-        //}
+        }
 
+        System.err.println("heartbeat starting");
+        GameCommUDP heartbeat = new GameCommUDP("UDPclient", 6999);
+        heartbeat.start();
+
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        System.out.println("hearbeat: " + heartbeat.port());
     }
+    //}
 
 }

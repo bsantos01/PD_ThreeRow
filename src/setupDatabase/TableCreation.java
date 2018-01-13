@@ -90,6 +90,10 @@ public class TableCreation {
                     + "  PRIMARY KEY (id)\n"
                     + ") ENGINE=InnoDB DEFAULT CHARSET=utf8;");
 
+            myStmt.executeUpdate("ALTER TABLE `teste`.`pairs` "
+                    + "CHANGE COLUMN `id` `id` INT(11) NOT NULL AUTO_INCREMENT ,"
+                    + "ADD UNIQUE INDEX `id_UNIQUE` (`id` ASC);");
+
             //Status:
             //onRequest
             //inCreation
