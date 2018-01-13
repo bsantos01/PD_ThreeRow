@@ -77,7 +77,7 @@ public final class GameClientConnector implements Runnable {
                                     Thread.sleep(2000);
                                     game.closePop();
 
-                                    Thread.currentThread().interrupt();
+                                    
                                 } else {
                                     System.out.println("GameClientConnector: An unexpected string arrived..." + obj + "");
                                 }
