@@ -57,7 +57,24 @@ public class DBhandler {
 
     }
 
-    public List<String> getFreePlayers() throws SQLException {
+    public List<String> getFinishedGames() throws SQLException {
+        List<String> FPlist = new ArrayList<String>();
+        connect();
+        rs = myStmt.executeQuery("SELECT user1, user2, winner FROM pairs WHERE status='finished';");
+
+        if (rs.next() == false) {
+            System.out.println("No finished games.");
+            return null;
+        } else {
+
+            do {
+                FPlist.add((rs.getString("user1")+" VS "+ rs.getString("user2") +" - "+rs.getString("winner")));
+            } while (rs.next());
+        }
+        close();
+        return FPlist;
+    }
+        public List<String> getFreePlayers() throws SQLException {
         List<String> FPlist = new ArrayList<String>();
         connect();
         rs = myStmt.executeQuery("SELECT username FROM Client WHERE active=TRUE AND ingame=false AND free=true;");
