@@ -48,7 +48,7 @@ public class DBhandler {
 
         rs = myStmt.executeQuery("SELECT 1 FROM Client WHERE username='" + name + "' AND pass='" + Pass + "' AND active=FALSE;");
         boolean temp = rs.next();
-        if (temp = true) {
+        if (temp == true) {
             myStmt.executeUpdate("UPDATE Client SET active=1, free=true, ingame=0, IP='" + ip + "', PORT='" + port + "' where username='" + name + "';");
         }
 
@@ -290,24 +290,38 @@ public class DBhandler {
         }
     }
     
-    void cancelMatch(String string, String string0){
+    int cancelMatch(String string, String string0){
+        connect();
+        int i=0;
         try {
-            connect();
-            myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='"+ string0 +"' AND status='inCreation';");
-            close();
+            
+            i =myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string + "' AND user2='"+ string0 +"' AND status='inCreation';");
+            System.out.println("variavel retorna "+i);
+            if(i==0)
+               i= myStmt.executeUpdate("DELETE FROM pairs WHERE user1='" + string0 + "' AND user2='"+ string +"' AND status='inCreation';");
+           System.out.println("variavel depois retorna "+i);
+                   close();
+           
         } catch (SQLException ex) {
-            Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("Tentativa de eliminar um registo inexistente.");
         }
-    
+        
+           
+        this.freePlayer(string);
+        this.freePlayer(string0);
+        return i; 
     }
 
     void updateMatch(String string, String string0) {
          try {
             connect();
-            myStmt.executeUpdate("UPDATE pairs SET status='i0nCreation' where user1='" + string + "' AND user2='"+ string0 +"';");
+            myStmt.executeUpdate("UPDATE pairs SET status='inCreation' where user1='" + string + "' AND user2='"+ string0 +"';");
             close();
         } catch (SQLException ex) {
             Logger.getLogger(DBhandler.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    
+    
 }
