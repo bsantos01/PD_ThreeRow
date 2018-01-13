@@ -18,6 +18,8 @@ public class HeartbeatServer {
     private ObjectInputStream in;
     private String request;
 
+    private boolean exit = false;
+
     public HeartbeatServer(int listeningPort, String dbAdress) throws SocketException {
         socket = null;
         packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
@@ -44,16 +46,18 @@ public class HeartbeatServer {
         return request;
 
     }
+    Thread HeartbeatThread = new Thread(new Runnable() {
+
+        @Override
+        public void run() {
+            processRequests();
+            socket.close();
+        }
+
+    });
 
     public void start() {
-        Thread HeartbeatThread = new Thread(new Runnable() {
 
-            @Override
-            public void run() {
-                processRequests();
-            }
-
-        });
         HeartbeatThread.start();
 
     }
@@ -65,7 +69,7 @@ public class HeartbeatServer {
         }
 
         int goOut = 0;
-        while (goOut < 3) {
+        while (goOut < 3 && !exit) {
 
             try {
 
@@ -85,7 +89,7 @@ public class HeartbeatServer {
 
                 System.out.println("Answer size: " + bOut.size());
                 socket.send(packet);
-                Thread.sleep(10 * 1000);
+                Thread.sleep(5 * 1000);
             } catch (IOException e) {
                 System.out.println(e);
             } catch (InterruptedException ex) {
@@ -107,38 +111,15 @@ public class HeartbeatServer {
             if (out != null) {
                 out.close();
             }
+            exit = true;
 
-            if (socket != null) {
-                socket.close();
-            }
+            HeartbeatThread.interrupt();
+            System.err.println("HeartbeatServer.interrupt()");
+
         } catch (IOException ex) {
             System.err.println("Heartbeat server: IOException closing..." + ex);
+        } catch (Exception ex) {
+            System.err.println("Heartbeat server: Exception closing..." + ex);
         }
     }
-
-//    public static void main(String[] args)
-//    {
-//        int listeningPort;
-//        HeartbeatServer heartbeat = null;
-//        try
-//        {
-//
-//            listeningPort = Integer.parseInt("6999");
-//            heartbeat = new HeartbeatServer(listeningPort, true);
-//            heartbeat.processRequests();
-//
-//        } catch (NumberFormatException e)
-//        {
-//            System.out.println("O porto de escuta deve ser um inteiro positivo.");
-//        } catch (SocketException e)
-//        {
-//            System.out.println("Ocorreu um erro ao nível do socket UDP:\n\t" + e);
-//        } finally
-//        {
-//            if (heartbeat != null)
-//            {
-//                heartbeat.closeSocket();
-//            }
-//        }
-//    }
 }

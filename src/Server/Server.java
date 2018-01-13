@@ -35,7 +35,7 @@ public class Server {
 
             startTCPManager();
 
-            starHeartbeat();
+            startHeartbeat();
             startInputListener();
             //join InputListener (typing "exit" would interrupt it
             //creating a domino effect that would close all other threads including
@@ -43,9 +43,10 @@ public class Server {
             inputListenerThread.join();
 
         } catch (InterruptedException e) {
+            System.out.println("Server InterruptedException start(): " + e);
 
         } catch (IOException e) {
-            //printError(e);
+            System.out.println("Server IOException start(): " + e);
         } finally {
             stop();
         }
@@ -106,8 +107,8 @@ public class Server {
         }
 
         stopInputListener();
-        stopHeartbeat();
         stopTCPManager();
+        stopHeartbeat();
 
         println("Exiting");
     }
@@ -116,7 +117,7 @@ public class Server {
         System.out.println(message);
     }
 
-    private void starHeartbeat() {
+    private void startHeartbeat() {
         try {
             println("Starting heartbeat . . . ");
 
@@ -132,7 +133,7 @@ public class Server {
     private void stopHeartbeat() {
 
         println("Closing heartbeat . . . ");
-        //hb.interrupt();
+        hb.interrupt();
 
     }
 }
