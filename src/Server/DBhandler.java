@@ -96,7 +96,7 @@ public class DBhandler {
         rs = myStmt.executeQuery("SELECT user1, user2, winner FROM pairs WHERE status='interrupted';");
 
         if (rs.next() == false) {
-            System.out.println("No finished games.");
+            System.out.println("No unfinished games.");
             return null;
         } else {
 
@@ -132,7 +132,7 @@ public class DBhandler {
 
         rs = myStmt.executeQuery("SELECT username, free FROM Client WHERE active=true;");
         if (rs.next() == false) {
-            System.out.println("No free players.");
+            System.out.println("No active players.");
             return null;
         } else {
             do {
@@ -150,7 +150,7 @@ public class DBhandler {
 
         rs = myStmt.executeQuery("SELECT user1, user2, status FROM Pairs WHERE status='inCreation' and status='inRequest';");
         if (rs.next() == false) {
-            System.out.println("No free players.");
+            System.out.println("No pairs available.");
             return null;
         } else {
             do {

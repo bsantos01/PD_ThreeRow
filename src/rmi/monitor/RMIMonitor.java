@@ -45,13 +45,10 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
         try {
             List<String> pairs = new ArrayList<>();
             pairs.add("Pairs on server:");
-
-            if (rmiService.getPairs() != null) {
-                pairs.addAll(rmiService.getPairs());
-            }
+            pairs.addAll(rmiService.getPairs());
 
             for (String str : pairs) {
-                System.err.println("Monitor: " + str);
+                System.err.println("Pairs: " + str);
             }
         } catch (Exception e) {
             System.out.println("RmiMonitor: printPairs() " + e);
@@ -63,13 +60,10 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
         try {
             List<String> users = new ArrayList<>();
             users.add("Users on server:");
-
-            if (rmiService.getUsers() != null) {
-                users.addAll(rmiService.getUsers());
-            }
+            users.addAll(rmiService.getUsers());
 
             for (String str : users) {
-                System.err.println("Monitor: " + str);
+                System.err.println("Users: " + str);
             }
         } catch (Exception e) {
             System.out.println("RmiMonitor: printUsers() " + e);
@@ -81,13 +75,10 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
         try {
             List<String> historic = new ArrayList<>();
             historic.add("Old Games:");
-
-            if (rmiService.getOldGames() != null) {
-                historic.addAll(rmiService.getUsers());
-            }
+            historic.addAll(rmiService.getOldGames());
 
             for (String str : historic) {
-                System.err.println("Monitor: " + str);
+                System.err.println("OldGames: " + str);
             }
         } catch (Exception e) {
             System.out.println("RmiMonitor: printHistory " + e);
