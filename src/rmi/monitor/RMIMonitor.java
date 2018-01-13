@@ -48,7 +48,7 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
             pairs.addAll(rmiService.getPairs());
 
             for (String str : pairs) {
-                System.err.println("Pairs: " + str);
+                System.out.println("Pairs: " + str);
             }
         } catch (Exception e) {
             System.out.println("RmiMonitor: printPairs() " + e);
@@ -63,7 +63,7 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
             users.addAll(rmiService.getUsers());
 
             for (String str : users) {
-                System.err.println("Users: " + str);
+                System.out.println("Users: " + str);
             }
         } catch (Exception e) {
             System.out.println("RmiMonitor: printUsers() " + e);
@@ -78,11 +78,25 @@ public class RMIMonitor extends UnicastRemoteObject implements ServerMonitorList
             historic.addAll(rmiService.getOldGames());
 
             for (String str : historic) {
-                System.err.println("OldGames: " + str);
+                System.out.println("OldGames: " + str);
             }
         } catch (Exception e) {
             System.out.println("RmiMonitor: printHistory " + e);
         }
+    }
+
+    @Override
+    public void printSeparator() throws RemoteException {
+        System.out.println("<><><><><><>");
+
+    }
+
+    @Override
+    public void updatePrinter() throws RemoteException {
+        printSeparator();
+        printPairs();
+        printUsers();
+        printHistory();
     }
 
     public void terminate() throws RemoteException {

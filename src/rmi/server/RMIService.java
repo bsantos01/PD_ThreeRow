@@ -47,9 +47,11 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         for (ServerMonitorListener observer : observers) {
             if (observer != null) {
                 System.out.println("------------");
-                observer.printPairs();
-                observer.printUsers();
-                observer.printHistory();
+                observer.updatePrinter();
+//                observer.printSeparator();
+//                observer.printPairs();
+//                observer.printUsers();
+//                observer.printHistory();
             }
         }
     }
@@ -103,6 +105,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
     public List<String> getUsers() throws RemoteException {
 
         try {
+            users.clear();
             if (database.getUsersLogged() != null) {
                 users.addAll(database.getUsersLogged());
             } else {
@@ -112,7 +115,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         } catch (SQLException ex) {
             System.out.println("RMIService: SQLException " + ex);
         } catch (Exception ex) {
-            System.out.println("RMIService: Exception " + ex);
+            System.out.println("RMIService: Exception getUsers" + ex);
             //users.add("No users are On!");
         }
         return users;
@@ -122,6 +125,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
     @Override
     public List<String> getPairs() throws RemoteException {
         try {
+            pairs.clear();
             if (database.getPairs() != null) {
                 pairs.addAll(database.getPairs());
             } else {
@@ -131,7 +135,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         } catch (SQLException ex) {
             System.out.println("RMIService: SQLException " + ex);
         } catch (Exception ex) {
-            System.out.println("RMIService: Exception " + ex);
+            System.out.println("RMIService: Exception getPairs " + ex);
         }
         return pairs;
     }
@@ -139,7 +143,8 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
     @Override
     public List<String> getOldGames() throws RemoteException {
         try {
-            if (!database.getFinishedGames().isEmpty()) {
+            oldGames.clear();
+            if (database.getFinishedGames() != null) {
                 oldGames.addAll(database.getFinishedGames());
             } else {
                 oldGames.add("No users are on...");
@@ -147,7 +152,7 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
         } catch (SQLException ex) {
             System.out.println("RMIService: SQLException " + ex);
         } catch (Exception ex) {
-            System.out.println("RMIService: Exception " + ex);
+            System.out.println("RMIService: Exception getOldGames" + ex);
         }
         return oldGames;
     }

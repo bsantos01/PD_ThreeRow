@@ -21,6 +21,7 @@ public class RMIServer {
         try {
             rmiService = new RMIService("localhost:3306");
             rmiService.run();
+
         } catch (RemoteException ex) {
             System.out.println("Erro ao iniciar o servico RMI! " + ex);
         }
