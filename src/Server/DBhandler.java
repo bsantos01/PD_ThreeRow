@@ -77,25 +77,38 @@ public class DBhandler {
 
     public List<String> getUsersLogged() throws SQLException {
         List<String> list = new ArrayList<String>();
-        System.out.println("1");
         connect();
-        System.out.println("2");
-        rs = myStmt.executeQuery("SELECT username FROM Client;");
-        System.out.println("3");
+
+        rs = myStmt.executeQuery("SELECT username, free FROM Client WHERE active=true;");
         if (rs.next() == false) {
             System.out.println("No free players.");
             return null;
         } else {
-            System.out.println("4");
             do {
-                list.add(rs.getString("username"));
-                System.out.println("DB: " + rs.getString("username"));
+                list.add(rs.getString("username") + " is free: " + rs.getBoolean("free"));
             } while (rs.next());
         }
         close();
         return list;
     }
     //AND ingame=false AND free=true
+
+    public List<String> getPairs() throws SQLException {
+        List<String> list = new ArrayList<String>();
+        connect();
+
+        rs = myStmt.executeQuery("SELECT user1, user2, status FROM Pairs WHERE status=inCreation and status=inRequest;");
+        if (rs.next() == false) {
+            System.out.println("No free players.");
+            return null;
+        } else {
+            do {
+                list.add(rs.getString("user1") + " : " + rs.getString("user2") + " : " + rs.getString("status"));
+            } while (rs.next());
+        }
+        close();
+        return list;
+    }
 
     public String getPortbyUsername(String username) throws SQLException {
         String ret;

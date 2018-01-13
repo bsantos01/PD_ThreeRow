@@ -47,6 +47,24 @@ public class RMIClient extends UnicastRemoteObject implements ServerMonitorListe
             users.add("uno uno uno");
 
             if (rmiService.getUsers() != null) {
+                users.addAll(rmiService.getPairs());
+            }
+
+            for (String str : users) {
+                System.err.println("Monitor: " + str);
+            }
+        } catch (Exception e) {
+            System.out.println("rmi.client.RMIClient.printPairs() " + e);
+        }
+    }
+
+    @Override
+    public void printUsers() throws RemoteException {
+        try {
+            List<String> users = new ArrayList<>();
+            users.add("Users on server:");
+
+            if (rmiService.getUsers() != null) {
                 users.addAll(rmiService.getUsers());
             }
 

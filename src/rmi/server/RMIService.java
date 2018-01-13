@@ -99,9 +99,6 @@ public class RMIService extends UnicastRemoteObject implements RemoteServiceInte
     public List<String> getUsers() throws RemoteException {
 
         try {
-            if (database == null) {
-                System.out.println("é esta merda!!!!");
-            }
             if (database.getUsersLogged() != null) {
                 users.addAll(database.getUsersLogged());
             } else {
