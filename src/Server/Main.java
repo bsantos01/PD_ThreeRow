@@ -1,9 +1,5 @@
 package Server;
 
-/**
- *
- * @author Bruno Santos
- */
 public class Main {
 
     public static void main(String[] args) throws IllegalStateException, ClassNotFoundException {

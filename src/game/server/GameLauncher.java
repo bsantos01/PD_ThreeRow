@@ -20,8 +20,8 @@ public class GameLauncher {
     private Pair pair;
 
     //getFromDb, and delete this
-    String user1 = "Bruno";
-    String user2 = "Miguel";
+    String user1 = " ";
+    String user2 = " ";
 
     public GameLauncher(InetAddress serviceAddress, String servicePort, InetAddress serviceAddress2, String servicePort2) {
         this.serviceAddress = serviceAddress;
@@ -70,9 +70,8 @@ public class GameLauncher {
         try {
             println("GameServer Running");
             startTCPGameServer();
-            heartbeatClient();
 
-//            database.setInGame(pair.getId());
+            database.setInGame(pair.getId());
 //            database.setOcuppied(user1);
 //            database.setOcuppied(user2);
             tcpManagerThread.join();
@@ -84,11 +83,6 @@ public class GameLauncher {
         } finally {
             stop();
         }
-    }
-
-    public void heartbeatClient() {
-        GameCommUDP cliente = new GameCommUDP("UDPclient", 6999);
-        cliente.start();
     }
 
     private void startTCPGameServer() throws IOException {
@@ -108,7 +102,12 @@ public class GameLauncher {
 //        database.setInterrupted(pair.getId());
 //        database.setOcuppied(user1);
 //        database.setOcuppied(user2);
-        tcpManagerThread.interrupt();
+        try {
+            tcpManagerThread.interrupt();
+        } catch (Exception e) {
+            System.out.println("stopTCp in Gamelauncher" + e);
+        }
+
         println("GameServer: Stopped");
     }
 

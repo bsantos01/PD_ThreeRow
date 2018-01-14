@@ -2,144 +2,140 @@ package Server;
 
 import java.io.*;
 import java.net.*;
-import java.util.*;
 
-public class HeartbeatServer
-{
+public class HeartbeatServer {
 
     public static final int MAX_SIZE = 10000;
     public static final String TIME_REQUEST = "HEARTBEAT";
 
     private DatagramSocket socket;
-    private DatagramPacket packet; 
-    private boolean debug;
+    private DatagramPacket packet;
+    private String dbAdress;
 
-    public HeartbeatServer(int listeningPort, boolean debug) throws SocketException
-    {
+    private String receivedMsg;
+    private ByteArrayOutputStream bOut;
+    private ObjectOutputStream out;
+    private ObjectInputStream in;
+    private String request;
+
+    boolean exit;
+
+    public HeartbeatServer(int listeningPort, String dbAdress) throws SocketException {
+        exit = false;
         socket = null;
         packet = new DatagramPacket(new byte[MAX_SIZE], MAX_SIZE);
         socket = new DatagramSocket(listeningPort);
-        this.debug = debug;
+        this.dbAdress = dbAdress;
     }
 
-    public String waitDatagram() throws IOException
-    {
-        String request;
-        ObjectInputStream in;
+    public String waitDatagram() throws IOException {
 
-        if (socket == null)
-        {
+        if (socket == null) {
             return null;
         }
-
+        socket.setSoTimeout(5000);
+        
+        if(exit) return "exit"; 
+        System.out.println(exit);
         socket.receive(packet);
+
         in = new ObjectInputStream(new ByteArrayInputStream(packet.getData()));
 
-        try
-        {
+        try {
             request = (String) (in.readObject());
-        } catch (ClassCastException | ClassNotFoundException e)
-        {
+        } catch (ClassCastException | ClassNotFoundException e) {
             System.out.println("Object was not a String " + packet.getAddress().getHostAddress() + ":" + packet.getPort());
             return null;
-        }
-
-        if (debug)
-        {
-            System.out.println("Recebido \"" + request + "\" de "
-                    + packet.getAddress().getHostAddress() + ":" + packet.getPort());
         }
 
         return request;
 
     }
+    Thread HeartbeatThread = new Thread(new Runnable() {
 
-    public void processRequests()
-    {
-        String receivedMsg;
-        Calendar calendar;
-        ByteArrayOutputStream bOut;
-        ObjectOutputStream out;
+        @Override
+        public void run() {
+            processRequests();
+            socket.close();
+        }
 
-        if (socket == null)
-        {
+    });
+
+    public void start() {
+
+        HeartbeatThread.start();
+
+    }
+
+    public void processRequests() {
+
+        if (socket == null) {
             return;
         }
 
-        if (debug)
-        {
-            System.out.println("UDP Serialized Time Server iniciado...");
-        }
+        int goOut = 0;
+        while (goOut < 3 && !exit) {
 
-        while (true)
-        {
-
-            try
-            {
+            try {
 
                 receivedMsg = waitDatagram();
-
-                if (receivedMsg == null)
-                {
+                if(exit)return;
+                if (!receivedMsg.equalsIgnoreCase(TIME_REQUEST)) {
+                    goOut++;
                     continue;
+                } else {
+                    goOut = 0;
                 }
-
-                if (!receivedMsg.equalsIgnoreCase(TIME_REQUEST))
-                {
-                    continue;
-                }
-
                 bOut = new ByteArrayOutputStream(MAX_SIZE);
                 out = new ObjectOutputStream(bOut);
 
-                out.writeObject("Database Adress");
+                out.writeObject(dbAdress);
                 packet.setData(bOut.toByteArray());
                 packet.setLength(bOut.size());
 
                 System.out.println("Answer size: " + bOut.size());
                 socket.send(packet);
-
-            } catch (IOException e)
-            {
+                for(int i = 0; i < 10; i++){
+                    Thread.sleep(1000);
+                    if(exit)return;
+                }
+            } catch (IOException e) {
                 System.out.println(e);
+            } catch (InterruptedException ex) {
+                System.out.println(ex);
+            }
+        }
+
+    }
+
+    public void interrupt() {
+        try {
+            exit = true;
+            //System.out.println("Thread is alive?" + HeartbeatThread.isAlive());
+            //System.out.println(exit);
+
+            HeartbeatThread.interrupt();
+
+            if (in != null) {
+                in.close();
+            }
+            if (bOut != null) {
+                bOut.close();
+            }
+            if (out != null) {
+                out.close();
             }
 
-        }
-
-    }
-
-    public void closeSocket()
-    {
-        if (socket != null)
-        {
             socket.close();
+            
+            
+            System.err.println("HeartbeatServer.interrupt()");
+            HeartbeatThread.join();
+
+        } catch (IOException ex) {
+            System.err.println("Heartbeat server: IOException closing..." + ex);
+        } catch (Exception ex) {
+            System.err.println("Heartbeat server: Exception closing..." + ex);
         }
     }
-
-//    public static void main(String[] args)
-//    {
-//        int listeningPort;
-//        HeartbeatServer heartbeat = null;
-//        try
-//        {
-//
-//            listeningPort = Integer.parseInt("6999");
-//            heartbeat = new HeartbeatServer(listeningPort, true);
-//            heartbeat.processRequests();
-//
-//        } catch (NumberFormatException e)
-//        {
-//            System.out.println("O porto de escuta deve ser um inteiro positivo.");
-//        } catch (SocketException e)
-//        {
-//            System.out.println("Ocorreu um erro ao nível do socket UDP:\n\t" + e);
-//        } finally
-//        {
-//            if (heartbeat != null)
-//            {
-//                heartbeat.closeSocket();
-//            }
-//        }
-//    }
-
 }

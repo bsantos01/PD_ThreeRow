@@ -35,7 +35,7 @@ public class GameDBHandler {
         List<Pair> pair = new ArrayList<>();
 
         connect();
-        rs = myStmt.executeQuery("SELECT * FROM Pairs WHERE status=inCreation;");
+        rs = myStmt.executeQuery("SELECT * FROM pairs WHERE status='inCreation';");
 
         if (rs.next() == false) {
             System.out.println("No pairs waiting.");

@@ -1,14 +1,11 @@
 package Server;
 
 import java.io.IOException;
+import java.net.SocketException;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import rmi.server.RMIService;
 
-/**
- *
- * @author Bruno Santos
- */
 public class Server {
 
     private String serverName;
@@ -19,6 +16,7 @@ public class Server {
     private final int servicePort;
     private Thread inputListenerThread;
     private InputListener inputListener;
+    private HeartbeatServer hb;
 
     public Server(String serverName, String serviceAddress, int servicePort) {
         this.serverName = serverName;
@@ -38,17 +36,26 @@ public class Server {
             println("Running");
 
             startTCPManager();
-
+            startHeartbeat();
             startInputListener();
+
+            try {
+                RMIService rmiService = new RMIService("localhost:3306");
+                rmiService.run();
+
+            } catch (RemoteException ex) {
+                System.out.println("Erro ao iniciar o servico RMI! " + ex);
+            }
             //join InputListener (typing "exit" would interrupt it
             //creating a domino effect that would close all other threads including
             //the main one)
             inputListenerThread.join();
 
         } catch (InterruptedException e) {
+            System.out.println("Server InterruptedException start(): " + e);
 
         } catch (IOException e) {
-            //printError(e);
+            System.out.println("Server IOException start(): " + e);
         } finally {
             stop();
         }
@@ -77,7 +84,7 @@ public class Server {
         try {
             tcpManager.killPlayers();
         } catch (SQLException ex) {
-            Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("Server: SQLException stopTCPManager(): " + ex);
         }
         tcpManagerThread.interrupt();
 
@@ -107,9 +114,9 @@ public class Server {
         if (!hasStarted) {
             throw new IllegalStateException("Server is not yet running.");
         }
+        hb.interrupt();
 
         stopInputListener();
-        //stopUDPManager();
         stopTCPManager();
 
         println("Exiting");
@@ -118,4 +125,18 @@ public class Server {
     public synchronized static void println(Object message) {
         System.out.println(message);
     }
+
+    private void startHeartbeat() {
+        try {
+            println("Starting heartbeat . . . ");
+
+            hb = new HeartbeatServer(6999, "localhost:3306");
+            hb.start();
+
+            println("OK");
+        } catch (SocketException ex) {
+            System.out.println("Server.starHeartbeat()");
+        }
+    }
+
 }

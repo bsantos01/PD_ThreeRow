@@ -29,7 +29,8 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
         this.serverName = serverName;
 
         serverTCPSocket = new ServerSocket(6001);
-        uh = new DBhandler();
+        println("Starting DBhandler . . . ");
+        uh = new DBhandler("localhost:3306");
         StartClientHandler();
         System.out.println("Port " + serverTCPSocket.getLocalPort() + " ");
 
@@ -86,7 +87,7 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
 
                                 if (arr[0].equalsIgnoreCase("Register")) {
                                     if (uh.register(arr[1], arr[2])) {
-                                        out.writeObject("Sucefully registered, player " + arr[1] + ".");
+                                        out.writeObject(arr[1] +" sucefully registered.");
                                         control = 1;
                                     } else {
                                         out.writeObject("Impossible to register.");
@@ -94,8 +95,9 @@ public class TCPManager implements Runnable//, ClientHandlerCallback
                                     out.flush();
                                 } else {
                                     if (arr[0].equalsIgnoreCase("Login")) {
-                                        if (uh.login(arr[1], arr[2], nextClient.getInetAddress(), nextClient.getPort())) {
-                                            out.writeObject("Sucefully logged in, player " + arr[1] + ".");
+                                        String ip =nextClient.getInetAddress().toString().substring(1);
+                                        if (uh.login(arr[1], arr[2], ip, nextClient.getPort())) {
+                                            out.writeObject(arr[1]+" sucefully logged in.");
                                             control = 1;
                                         } else {
                                             out.writeObject("Faulty login");

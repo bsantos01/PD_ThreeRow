@@ -1,22 +1,18 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package rmi.commons;
 
-import rmi.commons.ServerMonitorListener;
 import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.List;
 
-/**
- *
- * @author simao
- */
 public interface RemoteServiceInterface extends Remote {
 
-    public String getServerList() throws java.rmi.RemoteException;
+    public List<String> getUsers() throws RemoteException;
 
-    public void addObserver(ServerMonitorListener observer) throws java.rmi.RemoteException;
+    public List<String> getPairs() throws RemoteException;
 
-    public void removeObserver(ServerMonitorListener observer) throws java.rmi.RemoteException;
+    public List<String> getOldGames() throws RemoteException;
+
+    public void addObserver(ServerMonitorListener observer) throws RemoteException;
+
+    public void removeObserver(ServerMonitorListener observer) throws RemoteException;
 }

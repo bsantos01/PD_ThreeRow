@@ -1,10 +1,18 @@
 package rmi.commons;
 
-public interface ServerMonitorListener extends java.rmi.Remote {
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
-    public void printServers() throws java.rmi.RemoteException;
+public interface ServerMonitorListener extends Remote {
 
-    //print LoggedUsers
-    //print Pairs //inCreation //inGame
-    //print history
+    public void printSeparator() throws RemoteException;
+
+    public void printPairs() throws RemoteException;
+
+    public void printUsers() throws RemoteException;
+
+    public void printHistory() throws RemoteException;
+
+    public void updatePrinter() throws RemoteException;
+
 }

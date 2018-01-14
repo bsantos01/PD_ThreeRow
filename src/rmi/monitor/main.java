@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package rmi.client;
+package rmi.monitor;
 
 import java.rmi.RemoteException;
 
@@ -14,7 +14,7 @@ import java.rmi.RemoteException;
 public class main {
 
     public static void main(String[] args) throws RemoteException {
-        RMIClient client = new RMIClient();
+        RMIMonitor client = new RMIMonitor("localhost");
         client.run();
     }
 
